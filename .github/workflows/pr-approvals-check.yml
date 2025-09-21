@@ -1,0 +1,84 @@
+name: Require 1 Admin and 1 Maintainer Approval
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, review_requested]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  check-approvals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const core = require('@actions/core');
+            const prNumber = context.payload.pull_request
+              ? context.payload.pull_request.number
+              : context.payload.review.pull_request_url.split('/').pop();
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100
+            });
+
+            // Keep only the latest review per user
+            const latestByUser = new Map();
+            for (const r of reviews) latestByUser.set(r.user.id, r);
+            const approvals = [...latestByUser.values()].filter(r => r.state === 'APPROVED');
+
+            if (approvals.length === 0) {
+              core.setFailed('No approvals yet.');
+              return;
+            }
+
+            const approverLogins = approvals.map(a => a.user.login.toLowerCase());
+            core.info(`Approvers: ${approverLogins.join(', ')}`);
+
+            async function teamHasUser(org, team_slug, username) {
+              try {
+                await github.rest.teams.getMembershipForUserInOrg({ org, team_slug, username });
+                return true;
+              } catch (e) {
+                return false;
+              }
+            }
+
+            const org = context.repo.owner;
+            const adminTeam = 'pyseafom-admins';
+            const maintainerTeam = 'pyseafom-maintainers';
+            const prAuthor = pr.user.login.toLowerCase();
+
+            let hasAdmin = false;
+            let hasMaintainer = false;
+
+            for (const login of approverLogins) {
+              if (await teamHasUser(org, adminTeam, login)) hasAdmin = true;
+              if (await teamHasUser(org, maintainerTeam, login)) hasMaintainer = true;
+            }
+
+            // Include PR author's approval if they're in either team
+            if (approverLogins.includes(prAuthor)) {
+              if (await teamHasUser(org, adminTeam, prAuthor)) hasAdmin = true;
+              if (await teamHasUser(org, maintainerTeam, prAuthor)) hasMaintainer = true;
+            }
+
+            if (!hasAdmin || !hasMaintainer) {
+              core.setFailed(`Approval missing: need at least 1 Admin (${hasAdmin}) and 1 Maintainer (${hasMaintainer}).`);
+            } else {
+              core.info('Approval policy satisfied: 1 Admin and 1 Maintainer.');
+            }

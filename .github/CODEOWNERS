@@ -1,0 +1,6 @@
+# Global owners for all files
+* @SEAFOM-Fiber-Optic-Monitoring-Group/pyseafom-admins @SEAFOM-Fiber-Optic-Monitoring-Group/pyseafom-maintainers 
+
+
+# Maintainers own automation and templates
+.github/** @SEAFOM-Fiber-Optic-Monitoring-Group/pyseafom-maintainers
