@@ -3,17 +3,13 @@
 **Repository**: SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM  
 **Version**: 0.1.3
 
-This document describes the data structures, parameters, and processing flow used in the pySEAFOM library for DAS (Distributed Acoustic Sensing) self-noise analysis.
+This document describes the data structures, parameters, and processing flow used in the pySEAFOM library for DAS (Distributed Acoustic Sensing) analysis.
 
 ---
 
 ## Overview
 
-The pySEAFOM library processes DAS time-series data to compute self-noise characteristics using RMS (Root Mean Square) averaging across multiple fiber channels. The analysis follows this flow:
-
-```
-Time-Domain Data → FFT → Amplitude Spectral Density → RMS Averaging → Self-Noise ASD
-```
+The pySEAFOM library provides analysis engines for processing DAS time-series data. The library uses standardized data structures and parameters across all analysis modules.
 
 ---
 
@@ -27,7 +23,7 @@ Time-Domain Data → FFT → Amplitude Spectral Density → RMS Averaging → Se
 - `n_channels`: Number of spatial channels in the section
 - `n_samples`: Number of time samples per channel
 
-**Description**: List of 2D arrays, where each array represents a cable section to be analyzed independently.
+**Description**: List of 2D arrays, where each array represents a cable section to be analyzed independently by the analysis engines.
 
 **Example**:
 ```python
@@ -47,7 +43,9 @@ sections = [
 | Parameter | Type | Units | Description | Example |
 |-----------|------|-------|-------------|---------|
 | `fs` (interrogation_rate) | `float` | Hz | DAS interrogation rate (sampling frequency) | `10000` (10 kHz) |
+| `duration` | `float` | seconds | Total measurement duration | `120` (2 minutes) |
 | `gauge_length` | `float` | meters | DAS gauge length (spatial resolution) | `10.0` |
+| `n_channels` | `int` | - | Total number of channels in dataset | `100` |
 
 ### Section Definition
 
@@ -78,6 +76,7 @@ sections = [
 **Example**:
 ```python
 fs = 10000              # 10 kHz sampling
+duration = 120          # 120 seconds
 N = fs * duration       # 1,200,000 samples
 freq_resolution = fs / N # 0.0083 Hz
 M = N // 2 + 1         # 600,001 FFT bins
@@ -87,24 +86,25 @@ M = N // 2 + 1         # 600,001 FFT bins
 
 ## Output Data Structure
 
-### Primary Output: `results`
+### Output Format: `results`
 
 **Type**: `list of tuple`
 
-**Structure**: `[(frequencies_1, asd_1), (frequencies_2, asd_2), ...]`
+**Structure**: `[(frequencies_1, values_1), (frequencies_2, values_2), ...]`
 - One tuple per input section
 - `frequencies`: `numpy.ndarray` of frequency bins (Hz)
-- `asd`: `numpy.ndarray` of amplitude spectral density values (data_unit/√Hz)
+- `values`: `numpy.ndarray` of analysis results (units depend on analysis engine)
 
 **Example**:
 ```python
-results = calculate_self_noise(sections, interrogation_rate=fs, ...)
-# results[0] = (freqs_section1, asd_section1)
-# results[1] = (freqs_section2, asd_section2)
+# Generic analysis output
+results = analysis_engine(sections, interrogation_rate=fs, ...)
+# results[0] = (freqs_section1, values_section1)
+# results[1] = (freqs_section2, values_section2)
 
-freqs, asd = results[0]  # First section
+freqs, values = results[0]  # First section
 # freqs: array([0.0, 0.0083, 0.0167, ..., 5000.0])  # 0 to Nyquist
-# asd: array([12.5, 18.3, 15.7, ..., 10.2])        # in pε/√Hz
+# values: array([12.5, 18.3, 15.7, ..., 10.2])      # Engine-specific units
 ```
 
 ### Frequency Array
@@ -117,7 +117,7 @@ freqs, asd = results[0]  # First section
 
 ---
 
-## Processing Flow
+## Common Processing Steps
 
 ### 1. Section Extraction
 ```python
@@ -128,8 +128,8 @@ sections = [
 ]
 ```
 
-### 2. Per-Channel FFT
-For each channel in each section:
+### 2. Per-Channel FFT (when applicable)
+For frequency-domain analysis:
 ```python
 # Apply window function (if specified)
 windowed_data = data[ch, :] * window
@@ -137,21 +137,21 @@ windowed_data = data[ch, :] * window
 # Compute FFT
 fft_result = numpy.fft.rfft(windowed_data)
 
-# Compute amplitude spectral density
-asd_ch = abs(fft_result) / normalization_factor
+# Further processing depends on analysis engine
 ```
 
-### 3. RMS Averaging Across Channels
+### 3. Multi-Channel Analysis
+Analysis engines may aggregate across channels:
 ```python
-# For each frequency bin, compute RMS across all channels
-asd_section = sqrt(mean(asd_ch[:, freq_bin]**2, axis=channels))
+# Example: RMS averaging, coherence analysis, etc.
+# Implementation varies by engine
 ```
 
 ### 4. Return Results
 ```python
 results = [
-    (frequencies, asd_section_1),
-    (frequencies, asd_section_2),
+    (frequencies, values_section_1),
+    (frequencies, values_section_2),
     ...
 ]
 ```
@@ -198,11 +198,11 @@ asd_db = 20 * log10(asd / 1.0)
 
 ---
 
-## Example Complete Workflow
+## Example Workflow
 
 ```python
 import numpy as np
-from pySEAFOM import self_noise
+from pySEAFOM import analysis_engine  # Replace with specific engine
 
 # === Input Parameters ===
 fs = 10000                          # Sampling rate: 10 kHz
@@ -223,8 +223,8 @@ sections = [
     data[60:100, :]    # Section 2: 40 channels
 ]
 
-# === Compute Self-Noise ===
-results = self_noise.calculate_self_noise(
+# === Run Analysis Engine ===
+results = analysis_engine(
     data_sections=sections,
     interrogation_rate=fs,
     window_function='blackman-harris',
@@ -232,33 +232,11 @@ results = self_noise.calculate_self_noise(
 )
 
 # === Access Results ===
-freqs_s1, asd_s1 = results[0]  # Section 1
-freqs_s2, asd_s2 = results[1]  # Section 2
+freqs_s1, values_s1 = results[0]  # Section 1
+freqs_s2, values_s2 = results[1]  # Section 2
 
 print(f"Section 1: {len(freqs_s1)} frequency bins")
-print(f"ASD at 100 Hz: {asd_s1[freqs_s1 == 100][0]:.2f} {data_unit}/√Hz")
-
-# === Visualize ===
-self_noise.plot_combined_self_noise_db(
-    results=results,
-    title='DAS Self-Noise Analysis',
-    test_sections=test_sections,
-    gauge_length=gauge_length,
-    data_unit=data_unit,
-    sampling_freq=fs,
-    n_channels=n_channels,
-    duration=duration
-)
-
-# === Generate Report ===
-self_noise.report_self_noise(
-    results=results,
-    gauge_length=gauge_length,
-    test_sections=test_sections,
-    band_frequencies=[(1, 100), (100, 1000)],
-    report_in_db=False,
-    data_unit=data_unit
-)
+print(f"Value at 100 Hz: {values_s1[freqs_s1 == 100][0]:.2f} {data_unit}/√Hz")
 ```
 
 ---
@@ -271,30 +249,15 @@ self_noise.report_self_noise(
 - **Impact**: Longer duration provides better low-frequency resolution
 
 ### Channel Count per Section
-- **Minimum**: ~10 channels recommended for stable RMS averaging
+- **Recommended**: 10+ channels for statistical stability
 - **Typical**: 20-50 channels per section
-- **Impact**: More channels reduce statistical variance in self-noise estimate
+- **Impact**: More channels improve statistical robustness of multi-channel analysis
 
 ### Window Functions
 - **`'none'`**: No windowing, best frequency resolution, spectral leakage
 - **`'blackman-harris'`**: Excellent sidelobe suppression, slightly reduced resolution
 - **`'hann'`**: Good balance, industry standard
 - **`'flattop'`**: Best amplitude accuracy, poor resolution
-
----
-
-## Validation Metrics
-
-When testing with synthetic data (known ASD):
-
-```python
-# Compute relative error
-rel_error = abs(estimated_asd - known_asd) / known_asd
-
-# Typical performance
-median_error < 5%      # Good agreement
-mean_error < 10%       # Acceptable for most applications
-```
 
 ---
 
@@ -311,7 +274,7 @@ mean_error < 10%       # Acceptable for most applications
 | **Labels** | `test_sections` | `list[str]` | `['Section 1', 'Section 2']` |
 | **Units** | `data_unit` | `str` | `'pε'` |
 | **Processing** | `window_function` | `str` | `'blackman-harris'` |
-| **Output** | `results` | `list[(freqs, asd)]` | 2 tuples, one per section |
+| **Output** | `results` | `list[(freqs, values)]` | 2 tuples, one per section |
 
 ---
 
