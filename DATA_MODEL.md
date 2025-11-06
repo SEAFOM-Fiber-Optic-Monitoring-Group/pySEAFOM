@@ -43,9 +43,7 @@ sections = [
 | Parameter | Type | Units | Description | Example |
 |-----------|------|-------|-------------|---------|
 | `fs` (interrogation_rate) | `float` | Hz | DAS interrogation rate (sampling frequency) | `10000` (10 kHz) |
-| `duration` | `float` | seconds | Total measurement duration | `120` (2 minutes) |
 | `gauge_length` | `float` | meters | DAS gauge length (spatial resolution) | `10.0` |
-| `n_channels` | `int` | - | Total number of channels in dataset | `100` |
 
 ### Section Definition
 
@@ -69,24 +67,24 @@ sections = [
 
 | Parameter | Formula | Description |
 |-----------|---------|-------------|
-| `N` (total_samples) | `fs × duration` | Total number of time samples |
+| `N` (total_samples) | `n_channels × n_samples` | Total number of time samples in data |
 | `freq_resolution` | `fs / N` | Frequency bin width in Hz |
 | `M` (fft_bins) | `N // 2 + 1` | Number of FFT frequency bins (real FFT) |
 
 **Example**:
 ```python
 fs = 10000              # 10 kHz sampling
-duration = 120          # 120 seconds
-N = fs * duration       # 1,200,000 samples
-freq_resolution = fs / N # 0.0083 Hz
-M = N // 2 + 1         # 600,001 FFT bins
+# Given data array with shape (n_channels, n_samples)
+N = data.shape[1]       # Number of samples per channel
+freq_resolution = fs / N # Depends on data length
+M = N // 2 + 1         # FFT bins
 ```
 
 ---
 
 ## Output Data Structure
 
-### Output Format: `results`
+### Output Format: `frequency_spectra`
 
 **Type**: `list of tuple`
 
@@ -98,11 +96,11 @@ M = N // 2 + 1         # 600,001 FFT bins
 **Example**:
 ```python
 # Generic analysis output
-results = analysis_engine(sections, interrogation_rate=fs, ...)
-# results[0] = (freqs_section1, values_section1)
-# results[1] = (freqs_section2, values_section2)
+frequency_spectra = analysis_engine(sections, interrogation_rate=fs, ...)
+# frequency_spectra[0] = (freqs_section1, values_section1)
+# frequency_spectra[1] = (freqs_section2, values_section2)
 
-freqs, values = results[0]  # First section
+freqs, values = frequency_spectra[0]  # First section
 # freqs: array([0.0, 0.0083, 0.0167, ..., 5000.0])  # 0 to Nyquist
 # values: array([12.5, 18.3, 15.7, ..., 10.2])      # Engine-specific units
 ```
@@ -149,7 +147,7 @@ Analysis engines may aggregate across channels:
 
 ### 4. Return Results
 ```python
-results = [
+frequency_spectra = [
     (frequencies, values_section_1),
     (frequencies, values_section_2),
     ...
@@ -206,15 +204,13 @@ from pySEAFOM import analysis_engine  # Replace with specific engine
 
 # === Input Parameters ===
 fs = 10000                          # Sampling rate: 10 kHz
-duration = 120                      # Duration: 120 seconds
 gauge_length = 10.0                 # Gauge length: 10 meters
-n_channels = 100                    # Total channels: 100
 test_sections_channels = [[0,40], [60,99]]  # Two sections
 test_sections = ['Section 1', 'Section 2']
 data_unit = 'pε'                    # Picostrain units
 
 # === Load or Generate Data ===
-# Shape: (100 channels, 1,200,000 samples)
+# Shape: (n_channels, n_samples)
 data = np.load('das_measurements.npy')
 
 # === Extract Sections ===
@@ -224,7 +220,7 @@ sections = [
 ]
 
 # === Run Analysis Engine ===
-results = analysis_engine(
+frequency_spectra = analysis_engine(
     data_sections=sections,
     interrogation_rate=fs,
     window_function='blackman-harris',
@@ -232,8 +228,8 @@ results = analysis_engine(
 )
 
 # === Access Results ===
-freqs_s1, values_s1 = results[0]  # Section 1
-freqs_s2, values_s2 = results[1]  # Section 2
+freqs_s1, values_s1 = frequency_spectra[0]  # Section 1
+freqs_s2, values_s2 = frequency_spectra[1]  # Section 2
 
 print(f"Section 1: {len(freqs_s1)} frequency bins")
 print(f"Value at 100 Hz: {values_s1[freqs_s1 == 100][0]:.2f} {data_unit}/√Hz")
@@ -244,9 +240,9 @@ print(f"Value at 100 Hz: {values_s1[freqs_s1 == 100][0]:.2f} {data_unit}/√Hz")
 ## Data Quality Considerations
 
 ### Frequency Resolution
-- **Formula**: `Δf = fs / N = fs / (fs × duration) = 1 / duration`
-- **Example**: 120 s duration → 0.0083 Hz resolution
-- **Impact**: Longer duration provides better low-frequency resolution
+- **Formula**: `Δf = fs / N` where N is the number of samples per channel
+- **Example**: 1,200,000 samples at 10 kHz → 0.0083 Hz resolution
+- **Impact**: More samples provide better low-frequency resolution
 
 ### Channel Count per Section
 - **Recommended**: 10+ channels for statistical stability
@@ -267,14 +263,12 @@ print(f"Value at 100 Hz: {values_s1[freqs_s1 == 100][0]:.2f} {data_unit}/√Hz")
 |----------|-----------|------|---------|
 | **Input Data** | `data_sections` | `list[ndarray(n_ch, n_samp)]` | 2 sections, 40-41 channels each |
 | **Sampling** | `fs` | `float` | 10000 Hz |
-| **Duration** | `duration` | `float` | 120 s |
 | **Spatial** | `gauge_length` | `float` | 10.0 m |
-| **Channels** | `n_channels` | `int` | 100 |
 | **Sections** | `test_sections_channels` | `list[[int,int]]` | `[[0,40],[60,99]]` |
 | **Labels** | `test_sections` | `list[str]` | `['Section 1', 'Section 2']` |
 | **Units** | `data_unit` | `str` | `'pε'` |
 | **Processing** | `window_function` | `str` | `'blackman-harris'` |
-| **Output** | `results` | `list[(freqs, values)]` | 2 tuples, one per section |
+| **Output** | `frequency_spectra` | `list[(freqs, values)]` | 2 tuples, one per section |
 
 ---
 
