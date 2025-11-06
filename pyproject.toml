@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pySEAFOM"
+version = "0.1.2"
+description = "Performance analysis and testing tools for Distributed Acoustic Sensing (DAS) systems"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}  # Update if different
+authors = [
+    {name = "SEAFOM Fiber Optic Monitoring Group", email = "your.email@example.com"}
+]
+keywords = ["DAS", "distributed acoustic sensing", "self-noise", "fiber optic", "seismic"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "numpy>=1.20.0",
+    "scipy>=1.7.0",
+    "matplotlib>=3.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=3.0",
+    "black>=22.0",
+    "flake8>=4.0",
+    "jupyter>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM"
+Documentation = "https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM"
+Repository = "https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM"
+Issues = "https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/issues"
+
+[tool.setuptools]
+package-dir = {"" = "source"}
+
+[tool.setuptools.packages.find]
+where = ["source"]
