@@ -66,24 +66,48 @@ def calculate_asd(time_series, interrogation_rate, window_function='blackman-har
 
     return freqs, asd
 
-def calculate_self_noise(data_sections, interrogation_rate, gauge_length, wavelength=1550e-9, 
-                        refractive_index=1.4682, photoelastic=0.78, window_function='blackman-harris',
-                        data_type='phase'):
+def calculate_self_noise(data_sections, interrogation_rate,window_function='blackman-harris', data_type='phase'):
     """
-    Calculate self-noise from DAS data sections.
+    Calculate self-noise amplitude spectral density from DAS data sections.
     
-    Args:
-        data_sections: List of 2D arrays containing sensor data
-        interrogation_rate: Sampling rate in Hz
-        gauge_length: Gauge length in meters
-        wavelength: Laser wavelength in meters (default: 1550e-9)
-        refractive_index: Fiber refractive index (default: 1.4682)
-        photoelastic: Photoelastic coefficient (default: 0.78)
-        window_function: Window function for FFT (default: 'blackman-harris')
-        data_type: 'phase' or 'dphase' - if 'dphase', will integrate data (default: 'phase')
+    Computes the RMS amplitude spectral density (ASD) across multiple channels
+    for each test section using FFT analysis with configurable windowing.
     
-    Returns:
-        List of tuples (frequencies, RMS ASD)
+    Parameters
+    ----------
+    data_sections : list of ndarray
+        List of 2D arrays (channels × samples) containing DAS measurements for each test section.
+        Each section is analyzed independently.
+    interrogation_rate : float
+        Sampling frequency in Hz (e.g., 10000 for 10 kHz).
+    window_function : str, optional
+        FFT window function. Options: 'blackman-harris', 'flattop', 'hann', 'hamming', 'none'.
+        Default is 'blackman-harris'.
+    data_type : str, optional
+        Input data type: 'phase' (radians), 'pε' (picostrain), 'nε' (nanostrain), 
+        'rad' (radians), or 'dphase' (phase rate - will be integrated). 
+        Default is 'phase'.
+    
+    Returns
+    -------
+    list of tuple
+        List of (frequencies, rms_asd) tuples, one per section.
+        - frequencies : ndarray, frequency bins in Hz
+        - rms_asd : ndarray, RMS amplitude spectral density in the same units as input data
+    
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from pySEAFOM import calculate_self_noise
+    >>> 
+    >>> # Generate synthetic data (100 channels, 120000 samples)
+    >>> data = np.random.randn(100, 120000)
+    >>> sections = [data[0:50, :], data[50:100, :]]
+    >>> 
+    >>> # Calculate self-noise for two sections
+    >>> results = calculate_self_noise(sections, interrogation_rate=10000, 
+    ...                                gauge_length=10.0, data_type='pε')
+    >>> freqs, asd = results[0]  # First section results
     """
     results = []
     for section_idx, section in enumerate(data_sections):
@@ -112,20 +136,56 @@ def calculate_self_noise(data_sections, interrogation_rate, gauge_length, wavele
 
 
 
-def plot_combined_self_noise_db(results, title, test_sections, gauge_length, org_data_unit='unit', 
+def plot_combined_self_noise_db(results, title, test_sections, gauge_length, data_unit='unit', 
                                  sampling_freq=None, n_channels=None, duration=None):
     """
-    Plot all sections on the same graph in dB relative to picostrain/√Hz
+    Create publication-quality self-noise plots in dB scale with metadata overlay.
     
-    Args:
-        results: List of (frequencies, self_noise) tuples
-        title: Plot title
-        test_sections: Names of test sections
-        gauge_length: Gauge length in meters
-        org_data_unit: 'nano' or 'pico' - original data unit
-        sampling_freq: Sampling frequency in Hz (optional, for metadata box)
-        n_channels: Number of channels per section (optional, for metadata box)
-        duration: Total duration of data in seconds (optional, for metadata box)
+    Plots multiple test sections on the same graph with log-space smoothing,
+    frequency band highlighting (seismic 1-100 Hz, acoustic 100+ Hz), and
+    measurement parameter metadata box.
+    
+    Parameters
+    ----------
+    results : list of tuple
+        Output from `calculate_self_noise()`: list of (frequencies, asd) tuples.
+    title : str
+        Plot title.
+    test_sections : list of str
+        Names/labels for each test section (e.g., ['Section A', 'Section B']).
+    gauge_length : float
+        Gauge length in meters (displayed in metadata box).
+    data_unit : str, optional
+        Unit label for data ('pε', 'nε', 'rad', etc.). Default is 'unit'.
+    sampling_freq : float, optional
+        Sampling frequency in Hz (for metadata box). Default is None.
+    n_channels : int, optional
+        Number of channels per section (for metadata box). Default is None.
+    duration : float, optional
+        Total recording duration in seconds (for metadata box). Default is None.
+    
+    Returns
+    -------
+    None
+        Displays matplotlib figure. Use `plt.show()` to render or `plt.savefig()` to save.
+    
+    Examples
+    --------
+    >>> from pySEAFOM import calculate_self_noise, plot_combined_self_noise_db
+    >>> import matplotlib.pyplot as plt
+    >>> 
+    >>> # After calculating self-noise
+    >>> plot_combined_self_noise_db(
+    ...     results=results,
+    ...     title='DAS Self-Noise Comparison',
+    ...     test_sections=['Cable Section 1', 'Cable Section 2'],
+    ...     gauge_length=10.0,
+    ...     org_data_unit='pε',
+    ...     sampling_freq=10000,
+    ...     n_channels=100,
+    ...     duration=120
+    ... )
+    >>> plt.show()
     """
     # Create figure and main axes
     fig = plt.figure(figsize=(12, 8))
@@ -154,7 +214,7 @@ def plot_combined_self_noise_db(results, title, test_sections, gauge_length, org
     legend_fontsize = 16
 
     main_ax.set_xlabel("Frequency (Hz)", fontsize=label_fontsize)
-    main_ax.set_ylabel(f"Self-Noise (dB re. 1 {org_data_unit}/√Hz)", fontsize=label_fontsize)
+    main_ax.set_ylabel(f"Self-Noise (dB re. 1 {data_unit}/√Hz)", fontsize=label_fontsize)
     main_ax.set_title(title, fontsize=title_fontsize)
     
     # Configure grid
@@ -225,17 +285,48 @@ def plot_combined_self_noise_db(results, title, test_sections, gauge_length, org
 
 
 
-def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Section 2', 'Section 3'), band_frequencies=None, report_in_db=False,org_data_unit='unit'):
+def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Section 2', 'Section 3'), 
+                     band_frequencies=None, report_in_db=False, data_unit='unit'):
     """
-    Report self-noise measurements in variable units.
+    Generate formatted text report of self-noise values at key frequencies and bands.
     
-    Args:
-        results: List of frequency-magnitude pairs for each section
-        gauge_length: Gauge length in meters
-        test_sections: Names of test sections
-        plot: Whether to plot results
-        band_frequencies: List of (low, high) frequency bands to analyze
-        report_in_db: Whether to report values in dB
+    Prints self-noise values at standard frequencies (10, 100, 1000, 10000 Hz) and
+    optionally calculates RMS averages over custom frequency bands.
+    
+    Parameters
+    ----------
+    results : list of tuple
+        Output from `calculate_self_noise()`: list of (frequencies, asd) tuples.
+    gauge_length : float
+        Gauge length in meters (displayed in report header).
+    test_sections : tuple of str, optional
+        Names/labels for each test section. Default is ('Section 1', 'Section 2', 'Section 3').
+    band_frequencies : list of tuple, optional
+        List of (low_freq, high_freq) tuples defining frequency bands for averaging.
+        Example: [(1, 100), (100, 1000), (1000, 5000)]. Default is None.
+    report_in_db : bool, optional
+        If True, report values in dB scale. If False, use linear units. Default is False.
+    data_unit : str, optional
+        Unit label for data ('pε', 'nε', 'rad', etc.). Default is 'unit'.
+    
+    Returns
+    -------
+    None
+        Prints formatted report to stdout.
+    
+    Examples
+    --------
+    >>> from pySEAFOM import calculate_self_noise, report_self_noise
+    >>> 
+    >>> # After calculating self-noise
+    >>> report_self_noise(
+    ...     results=results,
+    ...     gauge_length=10.0,
+    ...     test_sections=['Section A', 'Section B'],
+    ...     band_frequencies=[(1, 100), (100, 1000)],
+    ...     report_in_db=False,
+    ...     org_data_unit='pε'
+    ... )
     """
     # Store values for averaging
     freq_values = {freq: [] for freq in [10, 100, 1000, 10000]}
@@ -252,11 +343,11 @@ def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Sectio
         print(f"\n{test_sections[i]}:")
         print(f"  Number of frequency points: {len(frequencies)}")
         if report_in_db:
-            print(f"  Self-noise values (dB re 1 {org_data_unit}/rtHz) at key frequencies:")
+            print(f"  Self-noise values (dB re 1 {data_unit}/rtHz) at key frequencies:")
             print(f"    Frequency (Hz) | Self-Noise (dB)")
         else:
-            print(f"  Self-noise values ({org_data_unit} per root Hz) at key frequencies:")
-            print(f"    Frequency (Hz) | Self-Noise ({org_data_unit}/rtHz)")
+            print(f"  Self-noise values ({data_unit} per root Hz) at key frequencies:")
+            print(f"    Frequency (Hz) | Self-Noise ({data_unit}/rtHz)")
         print(f"    --------------- | --------------------------")
 
         for freq in [10, 100, 1000, 10000]:
@@ -269,7 +360,7 @@ def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Sectio
 
         if band_frequencies:
             print("\n  Average self-noise in specified frequency bands:")
-            print(f"    Frequency Band (Hz) | Avg Self-Noise (dB) | Avg Self-Noise ({org_data_unit}/√Hz)")
+            print(f"    Frequency Band (Hz) | Avg Self-Noise (dB) | Avg Self-Noise ({data_unit}/√Hz)")
             print(f"    --------------- | ----------------- | -------------------")
             for band in band_frequencies:
                 low, high = band

@@ -69,13 +69,7 @@ plot_combined_self_noise_db(
 ### Current Modules
 
 #### `pySEAFOM.self_noise`
-Self-noise analysis tools for DAS interrogators:
-- **Self-Noise Calculation**: RMS amplitude spectral density across multiple channels
-- **Multi-Section Analysis**: Compare different cable sections or spatial locations
-- **Publication-Ready Plots**: dB-scale visualization with metadata and frequency bands
-- **Text Reports**: Generate formatted reports of key frequencies and band statistics
-- **Flexible Units**: Support for picostrain (pε), nanostrain (nε), radians, and arbitrary units
-- **Window Functions**: Multiple FFT window options (Blackman-Harris, Hann, Hamming, etc.)
+Self-noise analysis
 
 ### Future Modules (Planned)
 - **Linearity Analysis**: Dynamic range and linearity testing
