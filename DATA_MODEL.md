@@ -47,9 +47,7 @@ sections = [
 | Parameter | Type | Units | Description | Example |
 |-----------|------|-------|-------------|---------|
 | `fs` (interrogation_rate) | `float` | Hz | DAS interrogation rate (sampling frequency) | `10000` (10 kHz) |
-| `duration` | `float` | seconds | Total measurement duration | `120` (2 minutes) |
 | `gauge_length` | `float` | meters | DAS gauge length (spatial resolution) | `10.0` |
-| `n_channels` | `int` | - | Total number of channels in dataset | `100` |
 
 ### Section Definition
 
@@ -62,7 +60,7 @@ sections = [
 
 | Parameter | Type | Description | Example Values |
 |-----------|------|-------------|----------------|
-| `data_unit` | `str` | Physical unit of input data | `'pε'` (picostrain), `'nε'` (nanostrain), `'rad'` (radians), `'phase'`, `'dphase'` |
+| `data_unit` | `str` | Physical unit of input data | `'pε'` (picostrain), `'nε'` (nanostrain) |
 | `window_function` | `str` | FFT window function name | `'none'`, `'blackman-harris'`, `'hann'`, `'hamming'`, `'flattop'` |
 
 ---
@@ -80,7 +78,6 @@ sections = [
 **Example**:
 ```python
 fs = 10000              # 10 kHz sampling
-duration = 120          # 120 seconds
 N = fs * duration       # 1,200,000 samples
 freq_resolution = fs / N # 0.0083 Hz
 M = N // 2 + 1         # 600,001 FFT bins
