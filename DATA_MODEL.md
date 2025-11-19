@@ -1,7 +1,6 @@
 # pySEAFOM Data Model
 
 **Repository**: SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM  
-**Version**: 0.1.3
 
 This document describes the data structures, parameters, and processing flow used in the pySEAFOM library for DAS (Distributed Acoustic Sensing) analysis.
 
@@ -273,4 +272,3 @@ print(f"Value at 100 Hz: {values_s1[freqs_s1 == 100][0]:.2f} {data_unit}/√Hz")
 ---
 
 *Last Updated: November 6, 2025*  
-*pySEAFOM Version: 0.1.3*
