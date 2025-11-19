@@ -222,10 +222,6 @@ def plot_combined_self_noise_db(results, title, test_sections, gauge_length, dat
     main_ax.grid(True, which='major', linestyle='-')
     main_ax.grid(True, which='minor', linestyle='--', alpha=0.5)
 
-    # Add typical frequency bands
-    main_ax.axvspan(1, 100, alpha=0.3, color='lightgreen', label='Seismic Band')
-    main_ax.axvspan(100, max(frequencies), alpha=0.3, color='lightblue', label='Acoustic Band')
-    
     # Add legend with font size
     main_ax.legend(fontsize=legend_fontsize)
 
@@ -264,7 +260,7 @@ def plot_combined_self_noise_db(results, title, test_sections, gauge_length, dat
                     transform=main_ax.transAxes,
                     horizontalalignment='right',
                     verticalalignment='top',
-                    fontsize=12,
+                    fontsize=16,
                     family='monospace',
                     bbox=metadata_props)
     
@@ -286,7 +282,8 @@ def plot_combined_self_noise_db(results, title, test_sections, gauge_length, dat
 
 
 def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Section 2', 'Section 3'), 
-                     band_frequencies=None, report_in_db=False, data_unit='unit'):
+                     band_frequencies=None, report_in_db=False, data_unit='unit', 
+                     render_tables=False, table_figsize=(11,2.5)):
     """
     Generate formatted text report of self-noise values at key frequencies and bands.
     
@@ -308,11 +305,15 @@ def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Sectio
         If True, report values in dB scale. If False, use linear units. Default is False.
     data_unit : str, optional
         Unit label for data ('pε', 'nε', 'rad', etc.). Default is 'unit'.
+    render_tables : bool, optional
+        If True, renders matplotlib tables summarizing the reported values for each section.
+    table_figsize : tuple, optional
+        Figure size passed to matplotlib when `render_tables` is True. Default is (7, 3.5).
     
     Returns
     -------
     None
-        Prints formatted report to stdout.
+        Prints formatted report to stdout and optionally renders matplotlib tables.
     
     Examples
     --------
@@ -350,6 +351,8 @@ def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Sectio
             print(f"    Frequency (Hz) | Self-Noise ({data_unit}/rtHz)")
         print(f"    --------------- | --------------------------")
 
+        freq_table_rows = []
+
         for freq in [10, 100, 1000, 10000]:
             idx = np.argmin(np.abs(frequencies - freq))
             val = self_noise[idx]
@@ -357,6 +360,10 @@ def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Sectio
                 val = 20 * np.log10(val)
             print(f"    {frequencies[idx]:<14.2f} | {val:<25.2e}")
             freq_values[freq].append(val)
+            display_val = f"{val:.2f}" if report_in_db else f"{val:.2e}"
+            freq_table_rows.append([f"{frequencies[idx]:.2f}", display_val])
+
+        band_table_rows = []
 
         if band_frequencies:
             print("\n  Average self-noise in specified frequency bands:")
@@ -370,3 +377,43 @@ def report_self_noise(results, gauge_length, test_sections=('Section 1', 'Sectio
                     band_rms_db = 20 * np.log10(band_rms)
                     print(f"    [{low:6.1f}, {high:6.1f}]   | {band_rms_db:12.2f} dB | {band_rms:12.2e}")
                     band_values[f"{low}-{high}"].append(band_rms)
+                    band_table_rows.append([
+                        f"[{low:.1f}, {high:.1f}]",
+                        f"{band_rms_db:.2f}",
+                        f"{band_rms:.2e}"
+                    ])
+                else:
+                    print(f"    [{low:6.1f}, {high:6.1f}]   | {'N/A':>12}    | {'N/A':>12}")
+                    band_table_rows.append([
+                        f"[{low:.1f}, {high:.1f}]",
+                        "N/A",
+                        "N/A"
+                    ])
+
+        if render_tables:
+            n_tables = 1 + bool(band_frequencies)
+            fig, axs = plt.subplots(1, n_tables, figsize=table_figsize)
+            if n_tables == 1:
+                axs = [axs]
+            fig.suptitle(f"{test_sections[i]} — Self-noise Report", fontsize=14, fontweight='bold')
+            axs[0].axis('off')
+            freq_col_labels = [
+                "Frequency (Hz)",
+                "Self-Noise (dB)" if report_in_db else f"Self-Noise ({data_unit}/√Hz)"
+            ]
+            freq_table = axs[0].table(cellText=freq_table_rows, colLabels=freq_col_labels, loc='center')
+            freq_table.auto_set_font_size(False)
+            freq_table.set_fontsize(10)
+            freq_table.scale(1, 1.3)
+            if band_frequencies:
+                axs[1].axis('off')
+                band_col_labels = [
+                    "Band (Hz)",
+                    "Avg Self-Noise (dB)",
+                    f"Avg Self-Noise ({data_unit}/√Hz)"
+                ]
+                band_table = axs[1].table(cellText=band_table_rows, colLabels=band_col_labels, loc='center')
+                band_table.auto_set_font_size(False)
+                band_table.set_fontsize(10)
+                band_table.scale(1, 1.3)
+            plt.tight_layout()

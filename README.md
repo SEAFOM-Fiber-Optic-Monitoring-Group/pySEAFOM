@@ -101,7 +101,7 @@ Creates publication-quality self-noise plots.
 - `results`: Output from `calculate_self_noise()`
 - `test_sections` (list): Section names
 - `gauge_length` (float): Gauge length in meters
-- `org_data_unit` (str): Display unit
+- `data_unit` (str): Display unit
 - `title` (str): Plot title
 - `sampling_freq` (float): Sampling rate (for metadata box)
 - `n_channels` (int): Total channels (for metadata box)
@@ -116,7 +116,9 @@ Prints formatted text report.
 - `test_sections` (list): Section names
 - `band_frequencies` (list): Frequency bands for averaging, e.g., `[(1, 100), (100, 1000)]`
 - `report_in_db` (bool): Use dB scale or linear units
-- `org_data_unit` (str): Display unit
+- `data_unit` (str): Display unit
+- `render_tables` (bool): Render per-section summary tables with matplotlib
+- `table_figsize` (tuple): Figure size when rendering tables
 
 ## 🧪 Example Notebook
 
@@ -154,26 +156,32 @@ pytest tests/
 
 ```
 pySEAFOM/
-├── self_noise              - Self-noise analysis module
-│   ├── calculate_self_noise()
-│   ├── plot_combined_self_noise_db()
-│   └── report_self_noise()
-├── (future modules)        - Additional analysis engines
-└── examples/               - Example notebooks
-    └── self_noise_test.ipynb
+├── source/
+│   └── pySEAFOM/
+│       ├── __init__.py            # package exports
+│       └── self_noise.py          # self-noise analysis engine
+├── testing_notebooks/
+│   └── self_noise_test.ipynb      # synthetic validation notebook
+├── workflows/
+│   └── SELF_NOISE_WORKFLOW.md     # step-by-step processing summary
+├── README.md
+├── pyproject.toml
+├── setup.py
+├── MANIFEST.in
+└── dist/                         # build artifacts (created on release)
 ```
 
 ## 🔌 Adding New Modules
 
 To add a new analysis module:
 
-1. Create `source/your_module.py` with your functions
-2. Update `source/__init__.py`:
+1. Create `source/pySEAFOM/your_module.py` with your functions
+2. Update `source/pySEAFOM/__init__.py`:
    ```python
    from . import self_noise, your_module
    ```
-3. Add documentation to README
-4. Create example notebook in root directory
+3. Add documentation to this README (and module docstrings)
+4. Add or update an example notebook under `testing_notebooks/`
 
 See the existing `self_noise.py` module as a template.
 
