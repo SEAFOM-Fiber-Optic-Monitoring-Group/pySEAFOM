@@ -9,7 +9,7 @@ Modules:
 - (more modules to be added)
 """
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 __author__ = "SEAFOM Fiber Optic Monitoring Group"
 
 # Import submodules
