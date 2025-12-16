@@ -35,7 +35,6 @@ __all__ = [
 
 
 # Import submodules
-from . import self_noise
 from . import dynamic_range
 
 # Convenience imports for commonly used functions (optional, but matches their style)
