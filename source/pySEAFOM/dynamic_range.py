@@ -137,6 +137,7 @@ def _append_hilbert_csv(results_dir: str, row: Dict[str, Any]) -> str:
         "mode",
         "delta_t_from_window_start [s]",
         "peak_last_cycle [µε]",
+        "peak_over_basis [dB re radian/√Hz]",
 
         "trigger_time_abs [s]",
         "limit_envelope_strain [µε]",
@@ -175,6 +176,7 @@ def _append_thd_csv(results_dir: str, row: Dict[str, Any]) -> str:
         "mode",
         "delta_t_from_window_start [s]",
         "peak_last_cycle [µε]",
+        "peak_over_basis [dB re radian/√Hz]",
 
         "trigger_time_abs [s]",
         "limit_strain_peak [µε]",
@@ -224,6 +226,21 @@ def _phase_to_strain(
     if output_in_microstrain:
         strain = strain * 1e6
     return strain
+
+
+def _microstrain_to_phase(
+    strain_microstrain: float | NDArray[np.floating],
+    *,
+    wavelength_m: float = 1550e-9,
+    n_eff: float = 1.4682,
+    gauge_length: float = 6.38,
+    xi: float = 0.78,
+) -> NDArray[np.floating]:
+
+    coef = wavelength_m / (4.0 * np.pi * n_eff * gauge_length * xi)  
+    strain = np.asarray(strain_microstrain, dtype=float) * 1e-6     
+    phase_rad = strain / (coef + 1e-30)
+    return phase_rad.astype(float)
 
 
 def load_dynamic_range_data(
@@ -493,6 +510,8 @@ def analyze_dynamic_range_hilbert(
     gauge_length: Optional[float] = None,
     highpass_hz: Optional[float] = None,
 
+    radian_basis: Optional[float] = None,
+
     folder_or_file: Optional[str] = None,
     test_sections_channels: Optional[float] = None,
     duration: Optional[float] = None,
@@ -523,6 +542,15 @@ def analyze_dynamic_range_hilbert(
     delta_t = trigger_time - t0_ref
     peak_last = _max_strain_last_cycle(time_s, signal_microstrain, trigger_time, ref_freq_hz)
 
+    dr_dB = None
+    if radian_basis is not None and gauge_length is not None:
+        rb = float(radian_basis)
+        gl = float(gauge_length)
+        if np.isfinite(rb) and rb > 0 and np.isfinite(gl) and gl > 0 and np.isfinite(peak_last) and peak_last > 0:
+            peak_rad = float(_microstrain_to_phase(peak_last, gauge_length=gl))
+            if np.isfinite(peak_rad) and peak_rad > 0:
+                dr_dB = float(20.0 * np.log10(peak_rad / rb))
+
     print("\n[HILBERT DYNAMIC RANGE]")
     print("+" + "-" * 60 + "+")
     print("| {:<35s} | {:>20s} |".format("Metric", "Value"))
@@ -531,6 +559,8 @@ def analyze_dynamic_range_hilbert(
     print("| {:<35s} | {:>20.3f} |".format("Δt from window start [s]", delta_t))
     print("| {:<35s} | {:>20.1f} |".format("Limit envelope strain [µε]", limit_env))
     print("| {:<35s} | {:>20.1f} |".format("Peak strain (last cycle) [µε]", peak_last))
+    if dr_dB is not None:
+        print("| {:<35s} | {:>20.2f} |".format("Peak/Basis [dB re rad/√Hz]", dr_dB))
     print("+" + "-" * 60 + "+")
     print(f"[HILBERT] Safe zone = {safezone_s:.2f} s")
 
@@ -543,12 +573,15 @@ def analyze_dynamic_range_hilbert(
         metadata_lines.append(f"Spatial Resolution: {delta_x_m:.2f} m")
     if highpass_hz is not None and highpass_hz > 0:
         metadata_lines.append(f"High-pass: {highpass_hz:.2f} Hz")
+
     metadata_lines.append(f"Ref. frequency: {ref_freq_hz:.2f} Hz")
     metadata_lines.append(f"Max strain: {max_strain_microstrain:.1f} µε")
     metadata_lines.append(f"Error threshold: {error_threshold_frac*100:.1f} %")
     metadata_lines.append(f"Safe zone: {safezone_s:.2f} s")
     metadata_lines.append(f"Error relative time trigger: {delta_t:.2f} s")
     metadata_lines.append(f"Error strain trigger: {peak_last:.2f} µε")
+    if dr_dB is not None:
+        metadata_lines.append(f"Peak/Basis: {dr_dB:.2f} dB re radian/√Hz")
 
     fig = None
     if show_plot or save_results:
@@ -573,6 +606,7 @@ def analyze_dynamic_range_hilbert(
             "mode": mode,
             "delta_t_from_window_start [s]": delta_t,
             "peak_last_cycle [µε]": peak_last,
+            "peak_over_basis [dB re radian/√Hz]": dr_dB,
 
             "trigger_time_abs [s]": trigger_time,
             "limit_envelope_strain [µε]": limit_env,
@@ -829,6 +863,8 @@ def analyze_dynamic_range_thd(
 
     time_start_s: Optional[float] = None,
 
+    radian_basis: Optional[float] = None,
+
     fs: Optional[float] = None,
     delta_x_m: Optional[float] = None,
     gauge_length: Optional[float] = None,
@@ -878,6 +914,15 @@ def analyze_dynamic_range_thd(
     delta_t = trigger_time - t0_ref
     peak_last = _max_strain_last_cycle(time_s, signal_microstrain, trigger_time, ref_freq_hz)
 
+    dr_dB = None
+    if radian_basis is not None and gauge_length is not None:
+        rb = float(radian_basis)
+        gl = float(gauge_length)
+        if np.isfinite(rb) and rb > 0 and np.isfinite(gl) and gl > 0 and np.isfinite(peak_last) and peak_last > 0:
+            peak_rad = float(_microstrain_to_phase(peak_last, gauge_length=gl))
+            if np.isfinite(peak_rad) and peak_rad > 0:
+                dr_dB = float(20.0 * np.log10(peak_rad / rb))
+
     print("\n[THD DYNAMIC RANGE]")
     print("+" + "-" * 60 + "+")
     print("| {:<35s} | {:>20s} |".format("Metric", "Value"))
@@ -886,6 +931,8 @@ def analyze_dynamic_range_thd(
     print("| {:<35s} | {:>20.3f} |".format("Δt from window start [s]", delta_t))
     print("| {:<35s} | {:>20.1f} |".format("Limit strain (peak) [µε]", limit_peak))
     print("| {:<35s} | {:>20.1f} |".format("Peak strain (last cycle) [µε]", peak_last))
+    if dr_dB is not None:
+        print("| {:<35s} | {:>20.2f} |".format("Peak/Basis [dB re rad/√Hz]", dr_dB))
     print("+" + "-" * 60 + "+")
     print(f"[THD] Safe zone = {safezone_s:.2f} s | min duration = {min_trigger_duration:.2f} s")
 
@@ -907,6 +954,8 @@ def analyze_dynamic_range_thd(
     metadata_lines.append(f"Min. duration: {min_trigger_duration:.2f} s")
     metadata_lines.append(f"Error relative time trigger: {delta_t:.2f} s")
     metadata_lines.append(f"Error strain trigger: {peak_last:.2f} µε")
+    if dr_dB is not None:
+        metadata_lines.append(f"Peak/Basis: {dr_dB:.2f} dB re radian/√Hz")
 
     fig = None
     if show_plot or save_results:
@@ -931,6 +980,7 @@ def analyze_dynamic_range_thd(
             "mode": mode,
             "delta_t_from_window_start [s]": delta_t,
             "peak_last_cycle [µε]": peak_last,
+            "peak_over_basis [dB re radian/√Hz]": dr_dB,
 
             "trigger_time_abs [s]": trigger_time,
             "limit_strain_peak [µε]": limit_peak,
@@ -967,4 +1017,3 @@ def analyze_dynamic_range_thd(
         plt.show()
     elif not show_plot and fig is not None:
         plt.close(fig)
-
