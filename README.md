@@ -304,6 +304,8 @@ Hilbert envelope dynamic range test. Compares measured envelope vs theoretical e
 
 - `save_results` (bool): Save figure + append CSV row
 
+- `radian_basis` (float | None): If provided with`gauge_length`, reports `peak_over_basis` as dB re rad/√Hz (computed from the peak of the last cycle converted from µε → rad). Otherwise the CSV field is empty and the metadata box omits it
+
 - `results_dir` (str): Output directory
 
 **Outputs:**
@@ -337,6 +339,8 @@ Sliding THD dynamic range test. Computes THD in a moving window and triggers whe
 - `safezone_s` (float): Initial safe zone where triggering is ignored [s]
 
 - `save_results` (bool): Save figure + append CSV row
+-
+- `radian_basis` (float | None): If provided with`gauge_length`, reports `peak_over_basis` as dB re rad/√Hz (computed from the peak of the last cycle converted from µε → rad). Otherwise the CSV field is empty and the metadata box omits it
 
 - `results_dir` (str): Output directory
 
@@ -371,9 +375,9 @@ See `dynamic_range_test.ipynb` for a complete example using synthetic data:
 
 - Extract and process data from a npy DAS matrix
 
-- Calculates dynamic range limit using Hilbert
+- Calculates dynamic range limit using Hilbert (`delta_t_from_window_start` [s], `peak_last_cycle` [µε], `peak_over_basis` [dB re rad/√Hz])
 
-- Calculates dynamic range limit using THD
+- Calculates dynamic range limit using THD (`delta_t_from_window_start` [s], `peak_last_cycle` [µε], `peak_over_basis` [dB re rad/√Hz])
 
   
 
@@ -453,6 +457,8 @@ pySEAFOM/
 
 ├── source/
 
+│   └── simulation_dynamic_range.py      # generate sythetic data for dynamic_range
+
 │   └── pySEAFOM/
 
 │       ├── __init__.py            # package exports
@@ -465,9 +471,7 @@ pySEAFOM/
 
 │   └── self_noise_test.ipynb      # synthetic validation notebook
 
-│   └── dynamic_range_test.py      # synthetic validation notebook
-
-│   └── simulation_dynamic_range.py      # generate sythetic data for dynamic_range
+│   └── dynamic_range_test.ipynb      # synthetic validation notebook
 
 ├── workflows/
 
