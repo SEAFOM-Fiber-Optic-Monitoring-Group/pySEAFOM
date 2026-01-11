@@ -10,7 +10,7 @@ long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
     name='pySEAFOM',
-    version='0.1.5',
+    version='0.1.8',
     author='SEAFOM Fiber Optic Monitoring Group',
     author_email='peyman.moradi@bakerhughes.com',  # TODO: Update this
     description='Performance analysis and testing tools for Distributed Acoustic Sensing (DAS) systems',
@@ -28,7 +28,6 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Physics',
-        'License :: OSI Approved :: MIT License',  # TODO: Update if different
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',

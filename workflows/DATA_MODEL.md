@@ -51,6 +51,8 @@ sections = [
 | `test_sections_channels` | `list of [int, int]` | List of `[start, end]` channel ranges (inclusive) for each section | `[[0,40], [60,99]]` |
 | `test_sections` | `list of str` | Names/labels for each test section | `['Section 1', 'Section 2']` |
 
+Note: channel ranges and section labels are commonly used in notebooks/caller code to slice `data` into per-section arrays. Some engines (e.g., fidelity/crosstalk) operate on a single pre-sliced section array per call.
+
 ### Data Type and Processing
 
 | Parameter | Type | Description | Example Values |

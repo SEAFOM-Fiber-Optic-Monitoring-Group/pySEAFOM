@@ -1,14 +1,15 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pySEAFOM"
-version = "0.1.5"
+version = "0.1.8"
 description = "Performance analysis and testing tools for Distributed Acoustic Sensing (DAS) systems"
 readme = "README.md"
 requires-python = ">=3.8"
-license = {text = "MIT"}  # Update if different
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name = "SEAFOM Fiber Optic Monitoring Group", email = "your.email@example.com"}
 ]
@@ -17,7 +18,6 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Physics",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",

@@ -5,7 +5,7 @@
 ## Overview
 
 - Purpose: quantify DAS interrogator self-noise using multi-channel RMS averaging in the frequency domain.
-- Implementation: `pySEAFOM.source.pySEAFOM.self_noise` module (version 0.1.5).
+- Implementation: `pySEAFOM.source.pySEAFOM.self_noise` module (version 0.1.8).
 - Key outputs: per-section frequency spectra (`frequency_spectra`) expressed in the same engineering units as the input data (e.g., pε/√Hz).
 
 ## Required Inputs

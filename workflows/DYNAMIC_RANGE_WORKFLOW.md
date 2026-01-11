@@ -6,7 +6,7 @@
 ## Overview
 
 - Purpose: estimate the **dynamic range limit** from a controlled input where amplitude and slew rate increases over time.
-- Implementation: `pySEAFOM.source.pySEAFOM.dynamic_range` module (version 0.1.6).
+- Implementation: `pySEAFOM.source.pySEAFOM.dynamic_range` module (version 0.1.8).
 - Key outputs: trigger time (absolute + relative), limit amplitude µε at trigger, and optional plots + CSV logs.
 - Optional output: peak-over-basis in dB re rad/√Hz (requires radian_basis + gauge_length).
 
@@ -43,7 +43,7 @@
    - Sliding THD error test
 1. Report trigger time + limit amplitude; optionally save plots + append CSV logs.
 
-## Hilbert Envelope Engine (analyze_dynamic_range_hilbert)
+## Hilbert Envelope Engine (calculate_dynamic_range_hilbert)
 
 - Goal: compare **measured envelope** vs **theoretical envelope** of a ramped sine.
 - Steps:
@@ -55,7 +55,7 @@
 - Output decision:
   - If a violation exists: dynamic range limit is the **first violation** time and its theoretical envelope amplitude of the last stretcher cycle
 
-## Sliding THD Engine (analyze_dynamic_range_thd)
+## Sliding THD Engine (calculate_dynamic_range_thd)
 
 - Goal: detect non-linearity by monitoring **Total Harmonic Distortion** over time.
 - Steps (per sliding window):

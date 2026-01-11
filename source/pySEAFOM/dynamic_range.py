@@ -494,7 +494,7 @@ def plot_dynamic_range_hilbert(
     return fig, (ax_sig, ax_err)
 
 
-def analyze_dynamic_range_hilbert(
+def calculate_dynamic_range_hilbert(
     *,
     time_s: NDArray[np.floating],
     signal_microstrain: NDArray[np.floating],
@@ -845,7 +845,7 @@ def plot_dynamic_range_thd(
     return fig, (ax_sig, ax_thd)
 
 
-def analyze_dynamic_range_thd(
+def calculate_dynamic_range_thd(
     *,
     time_s: NDArray[np.floating],
     signal_microstrain: NDArray[np.floating],

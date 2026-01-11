@@ -126,6 +126,23 @@ plot_combined_self_noise_db(
 
 )
 
+
+# Fidelity (THD) example (single-section call; loop sections externally)
+section_ranges = [[0, 49], [100, 149]]
+section_names = ['Section A', 'Section B']
+
+for name, (ch0, ch1) in zip(section_names, section_ranges):
+  section = data[ch0:ch1 + 1, :]
+  fidelity_results = pySEAFOM.fidelity.calculate_fidelity_thd(
+    section,
+    fs=10000,
+    levels_time_steps=[[0, 600000], [660000, 1500000]],
+    stimulus_freq=500,
+    snr_threshold_db=-40,
+    section_name=name,
+  )
+  pySEAFOM.fidelity.report_fidelity_thd(fidelity_results)
+
 ```
 
   
@@ -136,16 +153,21 @@ plot_combined_self_noise_db(
 
 ### Current Modules
 
-  
-
 #### `pySEAFOM.self_noise`
 
 Self-noise analysis
+
 #### `pySEAFOM.dynamic_range`
 
 Dynamic range analysis
 
-  
+#### `pySEAFOM.fidelity`
+
+Fidelity (THD) analysis
+
+#### `pySEAFOM.crosstalk`
+
+Crosstalk analysis
 
 ### Future Modules (Planned)
 
@@ -155,15 +177,11 @@ Dynamic range analysis
 
 - **Noise Floor**: System noise characterization
 
-  
 
 ## 📚 Documentation
 
-  
 
 ### Main Functions (self_noise)
-
-  
 
 #### `calculate_self_noise()`
 
@@ -282,7 +300,7 @@ Optional unit conversion (phase to strain) and optional high-pass filtering for 
 
 - 1D array: processed signal (microstrain [µε] if conversion is enabled)
 
-#### `analyze_dynamic_range_hilbert()
+#### `calculate_dynamic_range_hilbert()
 `
 Hilbert envelope dynamic range test. Compares measured envelope vs theoretical envelope and triggers when the relative error exceeds a threshold.
 
@@ -314,7 +332,7 @@ Hilbert envelope dynamic range test. Compares measured envelope vs theoretical e
 - Optional figure: `dynamic_range_hilbert.png`
 - Optional CSV: `dynamic_range_hilbert.csv`
 
-#### `analyze_dynamic_range_thd()`
+#### `calculate_dynamic_range_thd()`
 
 Sliding THD dynamic range test. Computes THD in a moving window and triggers when THD exceeds a threshold for a minimum duration.
 
@@ -339,7 +357,7 @@ Sliding THD dynamic range test. Computes THD in a moving window and triggers whe
 - `safezone_s` (float): Initial safe zone where triggering is ignored [s]
 
 - `save_results` (bool): Save figure + append CSV row
--
+
 - `radian_basis` (float | None): If provided with`gauge_length`, reports `peak_over_basis` as dB re rad/√Hz (computed from the peak of the last cycle converted from µε → rad). Otherwise the CSV field is empty and the metadata box omits it
 
 - `results_dir` (str): Output directory
@@ -349,6 +367,53 @@ Sliding THD dynamic range test. Computes THD in a moving window and triggers whe
 - Prints a formatted summary (trigger time, limit strain, etc.)
 - Optional figure: `dynamic_range_thd.png`
 - Optional CSV: `dynamic_range_thd.csv`
+
+
+### Main Functions (fidelity)
+
+#### `calculate_fidelity_thd()`
+
+Computes fidelity as THD (%) at a known stimulus frequency for a single pre-sliced spatial section, across one or more time “levels”.
+
+**Inputs (typical):**
+
+- `time_series_data` (2D array): section matrix (channels_in_section × samples)
+- `fs` (float): Sampling frequency [Hz]
+- `levels_time_steps` (list[[start,end]] | [start,end]): Sample index range(s) per stimulus level
+- `stimulus_freq` (float): Fundamental frequency [Hz]
+- `snr_threshold_db` (float): SNR gate used to accept FFT blocks
+- `section_name` (str, optional): Label used in the report output
+
+**Returns:**
+
+- A structured dict with one section containing per-level THD and harmonic levels.
+
+#### `report_fidelity_thd()`
+
+Prints a compact text summary of `calculate_fidelity_thd()` results.
+
+
+### Main Functions (crosstalk)
+
+#### `calculate_crosstalk()`
+
+Computes a crosstalk profile and maximum crosstalk for a single spatial section centered on the stimulation point.
+
+**Returns:**
+
+- A result dict containing:
+  - `crosstalk_db` (1D array): dB relative to reference region
+  - `max_xt_db` (float): max crosstalk in the outer region
+  - `magnitudes` (1D array): linear magnitudes at stimulus frequency
+  - `reference_level` (float): linear reference magnitude
+
+#### `plot_crosstalk()`
+
+Plots a crosstalk profile (dB vs distance).
+
+#### `report_crosstalk()`
+
+Prints a compact text summary of `calculate_crosstalk()` results.
 
   
 
@@ -379,6 +444,20 @@ See `dynamic_range_test.ipynb` for a complete example using synthetic data:
 
 - Calculates dynamic range limit using THD (`delta_t_from_window_start` [s], `peak_last_cycle` [µε], `peak_over_basis` [dB re rad/√Hz])
 
+
+See `fidelity_test.ipynb` for a complete example using synthetic data:
+
+- Builds two time “levels” with different harmonic content
+- Runs per-section THD using `calculate_fidelity_thd()`
+- Prints a simple report via `report_fidelity_thd()`
+
+
+See `crosstalk_test.ipynb` for a complete example using synthetic data:
+
+- Generates synthetic stimulated data centered on a stimulation point
+- Computes crosstalk using `calculate_crosstalk()`
+- Plots the profile using `plot_crosstalk()` and prints a report via `report_crosstalk()`
+
   
 
 ## 📊 Typical Workflow
@@ -404,11 +483,28 @@ See `dynamic_range_test.ipynb` for a complete example using synthetic data:
 
 3. **Pre-process**: Use `data_processing()` for phase to strain (if needed) and high-pass (optional)
 
-4. **Hilbert Test**: Run `analyze_dynamic_range_hilbert()` to detect envelope-error trigger
+4. **Hilbert Test**: Run `calculate_dynamic_range_hilbert()` to detect envelope-error trigger
 
-5. **THD Test**: Run `analyze_dynamic_range_thd()` to detect harmonic-distortion trigger
+5. **THD Test**: Run `calculate_dynamic_range_thd()` to detect harmonic-distortion trigger
 
 6. **Report / Save**: Store plots + CSV summaries for traceability
+
+
+### Fidelity (THD) Workflow
+
+1. **Prepare Data**: Load DAS measurements (channels × samples)
+2. **Define Sections**: Select channel ranges for analysis
+3. **Define Levels**: Select time windows (sample ranges) for each stimulus level
+4. **Compute THD**: For each section, slice channels and run `calculate_fidelity_thd()` with `stimulus_freq` + `snr_threshold_db`
+5. **Report**: Print summaries using `report_fidelity_thd()`
+
+
+### Crosstalk Workflow
+
+1. **Prepare Data**: Load one spatial section centered on the stimulation point (SSL × samples)
+2. **Compute Crosstalk**: Run `calculate_crosstalk()` with `stimulus_freq`, `fs`, `gauge_length`, and `channel_spacing`
+3. **Visualize**: Plot profiles with `plot_crosstalk()`
+4. **Report**: Print summaries using `report_crosstalk()`
 
 
   
@@ -467,17 +563,23 @@ pySEAFOM/
 
 │       └── dynamic_range.py          # dynamic_range analysis engine
 
+│       └── fidelity.py             # fidelity / THD analysis engine
+
 ├── testing_notebooks/
 
 │   └── self_noise_test.ipynb      # synthetic validation notebook
 
 │   └── dynamic_range_test.ipynb      # synthetic validation notebook
 
+│   └── fidelity_test.ipynb         # synthetic validation notebook
+
 ├── workflows/
 
 │   └── SELF_NOISE_WORKFLOW.md     # step-by-step processing summary
 
 │   └── DYNAMIC_RANGE_WORKFLOW.md     # step-by-step processing summary
+
+│   └── FIDELITY_WORKFLOW.md        # step-by-step processing summary
 
 ├── README.md
 
