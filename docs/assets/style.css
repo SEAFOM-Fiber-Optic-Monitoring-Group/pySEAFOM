@@ -44,13 +44,31 @@ a:hover {
     padding-bottom: 10px;
 }
 
+.header-grid {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.header-left {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.header-right {
+    flex: 0 0 auto;
+    margin-left: auto;
+    align-self: flex-start;
+}
+
 .logo {
-    height: 68px;
+    height: 110px;
     width: auto;
-    max-width: 560px;
+    max-width: 520px;
     object-fit: contain;
     display: block;
-    margin-bottom: 18px;
+    margin-bottom: 0;
     filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.25));
 }
 
@@ -288,6 +306,20 @@ code {
 }
 
 @media (max-width: 860px) {
+    .header-grid {
+        flex-direction: column;
+    }
+
+    .header-right {
+        order: 0;
+        align-self: flex-end;
+        margin-bottom: 10px;
+    }
+
+    .header-left {
+        order: 1;
+    }
+
     .layout {
         grid-template-columns: 1fr;
     }
@@ -297,7 +329,7 @@ code {
     }
 
     .logo {
-        height: 58px;
+        height: 86px;
         max-width: 100%;
     }
 }
