@@ -180,6 +180,8 @@ Crosstalk analysis
 
 ## 📚 Documentation
 
+Live site (GitHub Pages): https://seafom-fiber-optic-monitoring-group.github.io/pySEAFOM/
+
 
 ### Main Functions (self_noise)
 
