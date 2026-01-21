@@ -1,4 +1,4 @@
-![pySEAFOM Logo](docs/assets/logo.png)
+<img src="docs/assets/logo.png" alt="pySEAFOM logo" width="280" style="max-width: 100%; height: auto;" />
 
   
 
