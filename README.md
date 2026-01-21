@@ -1,4 +1,4 @@
-![SEAFOM Logo](https://seafom.otm-networks.com/wp-content/uploads/sites/20/2017-12-01_SEAFOM-Fiber-Optic-Monitoring-Group_450x124.png)
+![pySEAFOM Logo](docs/assets/logo.png)
 
   
 
