@@ -44,31 +44,13 @@ a:hover {
     padding-bottom: 10px;
 }
 
-.header-grid {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
-}
-
-.header-left {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.header-right {
-    flex: 0 0 auto;
-    margin-left: auto;
-    align-self: flex-start;
-}
-
 .logo {
-    height: 110px;
+    height: 68px;
     width: auto;
-    max-width: 520px;
+    max-width: 560px;
     object-fit: contain;
     display: block;
-    margin-bottom: 0;
+    margin-bottom: 18px;
     filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.25));
 }
 
@@ -306,20 +288,6 @@ code {
 }
 
 @media (max-width: 860px) {
-    .header-grid {
-        flex-direction: column;
-    }
-
-    .header-right {
-        order: 0;
-        align-self: flex-end;
-        margin-bottom: 10px;
-    }
-
-    .header-left {
-        order: 1;
-    }
-
     .layout {
         grid-template-columns: 1fr;
     }
@@ -329,7 +297,7 @@ code {
     }
 
     .logo {
-        height: 86px;
+        height: 58px;
         max-width: 100%;
     }
 }
