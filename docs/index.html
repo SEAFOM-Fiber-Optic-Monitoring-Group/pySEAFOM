@@ -1,162 +1,182 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="pySEAFOM – Performance analysis and testing tools for Distributed Acoustic Sensing (DAS) systems." />
-    <title>pySEAFOM</title>
-    <link rel="stylesheet" href="assets/style.css" />
-  </head>
-  <body>
-    <header class="container header">
-      <img
-        class="logo"
-        src="assets/logo.png"
-        alt="pySEAFOM logo"
-        loading="lazy"
-      />
-      <h1>pySEAFOM</h1>
-      <p class="subtitle">
-        Performance analysis and testing tools for Distributed Acoustic Sensing (DAS) interrogators.
-      </p>
-      <div class="cta-row">
-        <a class="button primary" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM">GitHub</a>
-        <a class="button" href="https://pypi.org/project/pySEAFOM/">PyPI</a>
-        <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM#readme">README</a>
-      </div>
-    </header>
 
-    <div class="container layout">
-      <aside class="sidebar">
-        <div class="sidebar-title">On this page</div>
-        <nav class="sidebar-nav" aria-label="Page navigation">
-          <a href="#overview">Overview</a>
-          <a href="#quick-start">Quick start</a>
-          <div class="sidebar-section">Tests</div>
-          <a href="#self-noise">Self-noise</a>
-          <a href="#dynamic-range">Dynamic range</a>
-          <a href="#fidelity">Fidelity (THD)</a>
-          <a href="#crosstalk">Crosstalk</a>
-          <div class="sidebar-section">Links</div>
-          <a href="#resources">Resources</a>
-        </nav>
-      </aside>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+    content="pySEAFOM – Performance analysis and testing tools for Distributed Acoustic Sensing (DAS) systems." />
+  <title>pySEAFOM</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
 
-      <main class="content">
-        <section id="overview" class="card">
-          <h2>Overview</h2>
-          <p class="muted">
-            pySEAFOM provides standardized analysis workflows for evaluating DAS interrogator performance.
-            This site is a lightweight entry point; the detailed procedures live in the repo workflows and
-            the example notebooks.
-          </p>
-
-          <h3>Modules</h3>
-          <ul class="grid">
-            <li><strong>Self-noise</strong> – <span class="muted">pySEAFOM.self_noise</span></li>
-            <li><strong>Dynamic range</strong> – <span class="muted">pySEAFOM.dynamic_range</span></li>
-            <li><strong>Fidelity (THD)</strong> – <span class="muted">pySEAFOM.fidelity</span></li>
-            <li><strong>Crosstalk</strong> – <span class="muted">pySEAFOM.crosstalk</span></li>
-          </ul>
-        </section>
-
-        <section id="quick-start" class="card">
-          <h2>Quick start</h2>
-          <pre><code>pip install pySEAFOM</code></pre>
-          <p class="muted">
-            Examples:
-            <a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/tree/main/testing_notebooks">testing_notebooks</a>
-            · Workflows:
-            <a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/tree/main/workflows">workflows</a>
-          </p>
-        </section>
-
-        <section id="self-noise" class="card">
-          <h2>Self-noise</h2>
-          <p class="muted">Quantifies interrogator self-noise using multi-channel RMS averaging in the frequency domain.</p>
-          <div class="kv">
-            <div><span class="k">Primary API</span> <span class="v">pySEAFOM.self_noise.calculate_self_noise</span></div>
-            <div><span class="k">Output</span> <span class="v">per-section ASD spectrum (unit/√Hz)</span></div>
-          </div>
-          <ul class="bullets">
-            <li>Computes ASD per channel then RMS-averages across channels for each section.</li>
-            <li>Supports windowing + detrending; includes plotting/report helpers.</li>
-          </ul>
-          <div class="links-row">
-            <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/SELF_NOISE_WORKFLOW.md">Workflow</a>
-            <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/self_noise_test.ipynb">Notebook</a>
-          </div>
-        </section>
-
-        <section id="dynamic-range" class="card">
-          <h2>Dynamic range</h2>
-          <p class="muted">Estimates the dynamic range limit from a controlled ramped input (amplitude/slew increases over time).</p>
-          <div class="kv">
-            <div><span class="k">Engines</span> <span class="v">Hilbert-envelope error, Sliding THD</span></div>
-            <div><span class="k">Output</span> <span class="v">trigger time + limit amplitude (µε), optional plots/CSV</span></div>
-          </div>
-          <ul class="bullets">
-            <li>Loads/crops 2D DAS matrices, extracts a 1D trace, optionally converts phase→strain.</li>
-            <li>Triggers when relative envelope error or THD exceeds threshold (after a safe zone).</li>
-          </ul>
-          <div class="links-row">
-            <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/DYNAMIC_RANGE_WORKFLOW.md">Workflow</a>
-            <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/dynamic_range_test.ipynb">Notebook</a>
-          </div>
-        </section>
-
-        <section id="fidelity" class="card">
-          <h2>Fidelity (THD)</h2>
-          <p class="muted">Measures fidelity by estimating Total Harmonic Distortion (THD) at a known stimulus frequency.</p>
-          <div class="kv">
-            <div><span class="k">Primary API</span> <span class="v">pySEAFOM.fidelity.calculate_fidelity_thd</span></div>
-            <div><span class="k">Output</span> <span class="v">THD (%) + harmonics (dB re fundamental)</span></div>
-          </div>
-          <ul class="bullets">
-            <li>Averages channels to a 1D trace, then computes THD per defined “level” time block.</li>
-            <li>Includes block SNR screening to reject low-quality FFT blocks.</li>
-          </ul>
-          <div class="links-row">
-            <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/FIDELITY_WORKFLOW.md">Workflow</a>
-            <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/fidelity_test.ipynb">Notebook</a>
-          </div>
-        </section>
-
-        <section id="crosstalk" class="card">
-          <h2>Crosstalk</h2>
-          <p class="muted">Quantifies spatial crosstalk by comparing response at the stimulus frequency versus distance from a stimulated point.</p>
-          <div class="kv">
-            <div><span class="k">Primary API</span> <span class="v">pySEAFOM.crosstalk.calculate_crosstalk</span></div>
-            <div><span class="k">Output</span> <span class="v">crosstalk profile (dB re reference) + max crosstalk</span></div>
-          </div>
-          <ul class="bullets">
-            <li>Computes per-channel magnitude at stimulus frequency (FFT blocks + FlatTop window), then averages.</li>
-            <li>Uses the stretcher region around the center channel as the reference level.</li>
-          </ul>
-          <div class="links-row">
-            <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/CROSSTALK_WORKFLOW.md">Workflow</a>
-            <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/crosstalk_test.ipynb">Notebook</a>
-          </div>
-        </section>
-
-        <section id="resources" class="card">
-          <h2>Resources</h2>
-          <ul class="bullets">
-            <li><a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM">Source repository</a></li>
-            <li><a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/tree/main/workflows">Workflow guides</a></li>
-            <li><a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/tree/main/testing_notebooks">Test notebooks</a></li>
-          </ul>
-          <p class="muted">
-            Note: for compliance requirements and detailed procedures, refer to the applicable SEAFOM MSP documents.
-          </p>
-        </section>
-      </main>
+<body>
+  <header class="container header">
+    <img class="logo" src="assets/logo.png" alt="pySEAFOM logo" loading="lazy" />
+    <h1>pySEAFOM</h1>
+    <p class="subtitle">
+      Performance analysis and testing tools for Distributed Acoustic Sensing (DAS) interrogators.
+    </p>
+    <div class="cta-row">
+      <a class="button primary" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM">GitHub</a>
+      <a class="button" href="https://pypi.org/project/pySEAFOM/">PyPI</a>
+      <a class="button" href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM#readme">README</a>
     </div>
+  </header>
 
-    <footer class="container footer">
-      <p class="muted">
-        © SEAFOM Fiber Optic Monitoring Group · MIT License
-      </p>
-    </footer>
-  </body>
+  <div class="container layout">
+    <aside class="sidebar">
+      <div class="sidebar-title">On this page</div>
+      <nav class="sidebar-nav" aria-label="Page navigation">
+        <a href="#overview">Overview</a>
+        <a href="#quick-start">Quick start</a>
+        <div class="sidebar-section">Tests</div>
+        <a href="tests/self-noise.html">Self-noise</a>
+        <a href="tests/dynamic-range.html">Dynamic range</a>
+        <a href="tests/fidelity.html">Fidelity (THD)</a>
+        <a href="tests/crosstalk.html">Crosstalk</a>
+        <div class="sidebar-section">Links</div>
+        <a href="#resources">Resources</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <section id="overview" class="card">
+        <h2>Overview</h2>
+        <p class="muted">
+          pySEAFOM provides standardized analysis workflows for evaluating DAS interrogator performance.
+          This site is a lightweight entry point; the detailed procedures live in the repo workflows and
+          the example notebooks.
+        </p>
+
+        <h3>Modules</h3>
+        <ul class="grid">
+          <li><strong>Self-noise</strong> – <span class="muted">pySEAFOM.self_noise</span></li>
+          <li><strong>Dynamic range</strong> – <span class="muted">pySEAFOM.dynamic_range</span></li>
+          <li><strong>Fidelity (THD)</strong> – <span class="muted">pySEAFOM.fidelity</span></li>
+          <li><strong>Crosstalk</strong> – <span class="muted">pySEAFOM.crosstalk</span></li>
+        </ul>
+      </section>
+
+      <section id="quick-start" class="card">
+        <h2>Quick start</h2>
+        <pre><code>pip install pySEAFOM</code></pre>
+        <p class="muted">
+          Examples:
+          <a
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/tree/main/testing_notebooks">testing_notebooks</a>
+          · Workflows:
+          <a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/tree/main/workflows">workflows</a>
+        </p>
+      </section>
+
+      <section id="self-noise" class="card">
+        <h2>Self-noise</h2>
+        <p class="muted">Quantifies interrogator self-noise using multi-channel RMS averaging in the frequency domain.
+        </p>
+        <div class="kv">
+          <div><span class="k">Primary API</span> <span class="v">pySEAFOM.self_noise.calculate_self_noise</span></div>
+          <div><span class="k">Output</span> <span class="v">per-section ASD spectrum (unit/√Hz)</span></div>
+        </div>
+        <ul class="bullets">
+          <li>Computes ASD per channel then RMS-averages across channels for each section.</li>
+          <li>Supports windowing + detrending; includes plotting/report helpers.</li>
+        </ul>
+        <div class="links-row">
+          <a class="button primary" href="tests/self-noise.html">Open test page</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/SELF_NOISE_WORKFLOW.md">Workflow</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/self_noise_test.ipynb">Notebook</a>
+        </div>
+      </section>
+
+      <section id="dynamic-range" class="card">
+        <h2>Dynamic range</h2>
+        <p class="muted">Estimates the dynamic range limit from a controlled ramped input (amplitude/slew increases over
+          time).</p>
+        <div class="kv">
+          <div><span class="k">Engines</span> <span class="v">Hilbert-envelope error, Sliding THD</span></div>
+          <div><span class="k">Output</span> <span class="v">trigger time + limit amplitude (µε), optional
+              plots/CSV</span></div>
+        </div>
+        <ul class="bullets">
+          <li>Loads/crops 2D DAS matrices, extracts a 1D trace, optionally converts phase→strain.</li>
+          <li>Triggers when relative envelope error or THD exceeds threshold (after a safe zone).</li>
+        </ul>
+        <div class="links-row">
+          <a class="button primary" href="tests/dynamic-range.html">Open test page</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/DYNAMIC_RANGE_WORKFLOW.md">Workflow</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/dynamic_range_test.ipynb">Notebook</a>
+        </div>
+      </section>
+
+      <section id="fidelity" class="card">
+        <h2>Fidelity (THD)</h2>
+        <p class="muted">Measures fidelity by estimating Total Harmonic Distortion (THD) at a known stimulus frequency.
+        </p>
+        <div class="kv">
+          <div><span class="k">Primary API</span> <span class="v">pySEAFOM.fidelity.calculate_fidelity_thd</span></div>
+          <div><span class="k">Output</span> <span class="v">THD (%) + harmonics (dB re fundamental)</span></div>
+        </div>
+        <ul class="bullets">
+          <li>Averages channels to a 1D trace, then computes THD per defined “level” time block.</li>
+          <li>Includes block SNR screening to reject low-quality FFT blocks.</li>
+        </ul>
+        <div class="links-row">
+          <a class="button primary" href="tests/fidelity.html">Open test page</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/FIDELITY_WORKFLOW.md">Workflow</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/fidelity_test.ipynb">Notebook</a>
+        </div>
+      </section>
+
+      <section id="crosstalk" class="card">
+        <h2>Crosstalk</h2>
+        <p class="muted">Quantifies spatial crosstalk by comparing response at the stimulus frequency versus distance
+          from a stimulated point.</p>
+        <div class="kv">
+          <div><span class="k">Primary API</span> <span class="v">pySEAFOM.crosstalk.calculate_crosstalk</span></div>
+          <div><span class="k">Output</span> <span class="v">crosstalk profile (dB re reference) + max crosstalk</span>
+          </div>
+        </div>
+        <ul class="bullets">
+          <li>Computes per-channel magnitude at stimulus frequency (FFT blocks + FlatTop window), then averages.</li>
+          <li>Uses the stretcher region around the center channel as the reference level.</li>
+        </ul>
+        <div class="links-row">
+          <a class="button primary" href="tests/crosstalk.html">Open test page</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/CROSSTALK_WORKFLOW.md">Workflow</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/crosstalk_test.ipynb">Notebook</a>
+        </div>
+      </section>
+
+      <section id="resources" class="card">
+        <h2>Resources</h2>
+        <ul class="bullets">
+          <li><a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM">Source repository</a></li>
+          <li><a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/tree/main/workflows">Workflow
+              guides</a></li>
+          <li><a href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/tree/main/testing_notebooks">Test
+              notebooks</a></li>
+        </ul>
+        <p class="muted">
+          Note: for compliance requirements and detailed procedures, refer to the applicable SEAFOM MSP documents.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <footer class="container footer">
+    <p class="muted">
+      © SEAFOM Fiber Optic Monitoring Group · MIT License
+    </p>
+  </footer>
+</body>
+
 </html>
