@@ -291,25 +291,25 @@ code {
     color: var(--muted);
 }
 
-    height: 120px;
-    width: auto;
-    max-width: none;
-    object-fit: contain;
-    position: absolute;
-    top: 20px;
-    right: 32px;
-    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.25));
-    }
+height: 120px;
+width: auto;
+max-width: none;
+object-fit: contain;
+position: absolute;
+top: 20px;
+right: 32px;
+filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.25));
+}
 
-    .logo {
-        position: static;
-        height: 80px;
-        max-width: 100%;
-        margin-left: auto;
-        margin-right: 0;
-    }
+.logo {
+    position: static;
+    height: 80px;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: 0;
+}
 
-    .header {
-        padding-right: 32px;
-    }
+.header {
+    padding-right: 32px;
+}
 }

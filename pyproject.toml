@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pySEAFOM"
 version = "0.1.8"
-description = "Performance analysis and testing tools for Distributed Acoustic Sensing (DAS) systems"
+description = "DAS Performance Analysis Tools"
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
