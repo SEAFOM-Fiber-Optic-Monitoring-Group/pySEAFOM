@@ -13,7 +13,7 @@ setup(
     version='0.1.8',
     author='SEAFOM Fiber Optic Monitoring Group',
     author_email='peyman.moradi@bakerhughes.com',  # TODO: Update this
-    description='DAS Performance Testing Tools',
+    description='SEAFOM DAS Performance Testing Suite',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM',
