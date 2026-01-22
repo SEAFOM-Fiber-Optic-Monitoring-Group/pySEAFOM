@@ -69,6 +69,19 @@ h1 {
     border-radius: 4px;
     background: rgb(98, 208, 255);
     color: #bfeaff;
+    line-height: 1;
+}
+
+.title-py {
+    color: #c8c8c8;
+}
+
+.title-sea {
+    color: #c8c8c8;
+}
+
+.title-fom {
+    color: #ff4b4b;
 }
 
 .subtitle {
