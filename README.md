@@ -169,9 +169,11 @@ Fidelity (THD) analysis
 
 Crosstalk analysis
 
-### Future Modules (Planned)
+#### `pySEAFOM.frequency_response`
 
-- **Frequency Response**: Frequency-dependent sensitivity
+Frequency response analysis
+
+### Future Modules (Planned)
 
 - **Spatial Resolution**: Gauge length verification
 
@@ -194,13 +196,9 @@ Computes RMS amplitude spectral density across channels.
 **Parameters:**
 
 - `sections` (list): List of 2D arrays (channels × samples) for each test section
-
 - `interrogation_rate` (float): Sampling frequency in Hz
-
 - `gauge_length` (float): Gauge length in meters
-
 - `window_function` (str): FFT window type ('blackman-harris', 'hann', 'none', etc.)
-
 - `data_type` (str): Data unit ('pε', 'nε', 'rad', or custom)
 
   
@@ -220,19 +218,12 @@ Creates publication-quality self-noise plots.
 **Parameters:**
 
 - `results`: Output from `calculate_self_noise()`
-
 - `test_sections` (list): Section names
-
 - `gauge_length` (float): Gauge length in meters
-
 - `data_unit` (str): Display unit
-
 - `title` (str): Plot title
-
 - `sampling_freq` (float): Sampling rate (for metadata box)
-
 - `n_channels` (int): Total channels (for metadata box)
-
 - `duration` (float): Recording duration (for metadata box)
 
   
@@ -245,9 +236,6 @@ Prints formatted text report.
 
 
 ### Main Functions (dynamic_range)
-
-  
-
 #### `load_dynamic_range_data()`
 
 Loads one (or many) `.npy` files, builds a 2D matrix, and extracts a 1D trace at a chosen spatial position.
@@ -255,23 +243,14 @@ Loads one (or many) `.npy` files, builds a 2D matrix, and extracts a 1D trace at
 **Parameters:**
 
 - `folder_or_file` (str): Folder with `.npy` files or a single `.npy` file
-
 - `fs` (float): Sampling / interrogator rate in Hz
-
 - `delta_x_m` (float): Spatial step between channels [m]
-
 - `x1_m` (float): Spatial window start [m]
-
 - `x2_m` (float): Spatial window end [m]
-
 - `test_sections_channels` (float): Position inside the spatial window [m]
-
 - `time_start_s` (float): Analysis window start time [s]
-
 - `duration` (float | None): Analysis window duration [s]
-
 - `average_over_cols` (int): Number of adjacent channels to average
-
 - `matrix_layout` (str): `'time_space'`, `'space_time'`, or `'auto'`
 
 
@@ -288,13 +267,9 @@ Optional unit conversion (phase to strain) and optional high-pass filtering for 
 **Parameters:**
 
 - `trace` (1D array): Input trace (phase [rad] or strain)
-
 - `data_is_strain` (bool): If False, converts phase [rad] to microstrain [µε]
-
 - `gauge_length` (float): Gauge length [m] (used for converting)
-
 - `highpass_hz` (float | None): High-pass cutoff [Hz] (set None to disable)
-
 - `fs` (float): Sampling rate [Hz] (required when high-pass is enabled)
 
 
@@ -309,21 +284,13 @@ Hilbert envelope dynamic range test. Compares measured envelope vs theoretical e
 **Parameters:**
 
 - `time_s` (1D array): Time vector [s]
-
 - `signal_microstrain` (1D array): Trace in microstrain [µε]
-
 - `max_strain_microstrain` (float): Final theoretical envelope amplitude [µε]
-
 - `ref_freq_hz` (float): Expected sine frequency [Hz]
-
 - `smooth_window_s` (float): Envelope smoothing window [s]
-
 - `error_threshold_frac` (float): Relative error threshold (e.g., 0.3 = 30%)
-
 - `safezone_s` (float): Initial safe zone where triggering is ignored [s]
-
 - `save_results` (bool): Save figure + append CSV row
-
 - `radian_basis` (float | None): If provided with`gauge_length`, reports `peak_over_basis` as dB re rad/√Hz (computed from the peak of the last cycle converted from µε → rad). Otherwise the CSV field is empty and the metadata box omits it
 
 - `results_dir` (str): Output directory
@@ -341,25 +308,15 @@ Sliding THD dynamic range test. Computes THD in a moving window and triggers whe
 **Parameters:**
 
 - `time_s` (1D array): Time vector [s]
-
 - `signal_microstrain` (1D array): Trace in microstrain [µε]
-
 - `ref_freq_hz` (float): Expected fundamental frequency [Hz]
-
 - `window_s` (float): Sliding window length [s]
-
 - `overlap` (float): Window overlap fraction (e.g., 0.75 = 75%)
-
 - `thd_threshold_frac` (float): THD threshold (e.g., 0.15 = 15%)
-
 - `median_window_s` (float): Median smoothing window applied to the THD curve
-
 - `min_trigger_duration` (float): Minimum continuous violation time to trigger [s]
-
 - `safezone_s` (float): Initial safe zone where triggering is ignored [s]
-
 - `save_results` (bool): Save figure + append CSV row
-
 - `radian_basis` (float | None): If provided with`gauge_length`, reports `peak_over_basis` as dB re rad/√Hz (computed from the peak of the last cycle converted from µε → rad). Otherwise the CSV field is empty and the metadata box omits it
 
 - `results_dir` (str): Output directory
@@ -420,7 +377,70 @@ Prints a compact text summary of `calculate_crosstalk()` results.
   
 
 
+### Main Functions (frequency_response)
 
+#### `load_frequency_response_data()`
+
+Loads one (or many) `.npy` files, builds a 2D matrix, and extracts a 1D trace at a chosen spatial position.
+
+**Parameters:**
+
+- `folder_or_file` (str): Folder with `.npy` files or a single `.npy` file
+- `fs` (float): Sampling / interrogator rate in Hz
+- `delta_x_m` (float): Spatial step between channels [m]
+- `stretcher_start_m` (float): Spatial window start [m]
+- `stretcher_end_m` (float): Spatial window end [m]
+- `span_m` (int): Number of adjacent channels to average [m]
+- `matrix_layout` (str): `'time_space'`, `'space_time'`, or `'auto'`
+
+
+**Returns:**
+
+- `(time_s, trace_raw, distance_m, local_pos_m)` where:
+  - `time_s` is a 1D time vector [s]
+  - `trace_raw` is a 1D extracted signal
+  - `distance_m`is the size of the stretcher in [m]
+  - `local_pos_m` is the central position of the stretcher in [m]
+
+#### `data_processing()`
+
+Optional unit conversion (phase to strain) and optional high-pass filtering for the extracted 1D trace.
+
+**Parameters:**
+
+- `trace` (1D array): Input trace (phase [rad] or strain)
+- `data_is_strain` (bool): If False, converts phase [rad] to microstrain [µε]
+- `gauge_length` (float): Gauge length [m] (used for converting)
+- `highpass_hz` (float | None): High-pass cutoff [Hz] (set None to disable)
+- `fs` (float): Sampling rate [Hz] (required when high-pass is enabled)
+
+
+**Returns:**
+
+- 1D array: processed signal (microstrain [µε] if conversion is enabled)
+
+#### `analyze_frequency_response()
+`
+Frequency response test. Computes the DAS frequency response (FFT magnitude in dB re 1 µε) and the normalized frequency response over the step frequencies.
+
+**Parameters:**
+
+- `time_s` (1D array): Time vector [s]
+- `signal_microstrain` (1D array): Local trace in microstrain [µε]
+- `interrogation_rate_hz` (float): Repetition / sampling rate [Hz]
+- `n_steps` (int): Number of frequency steps
+- `freq_min_frac_nyq` (float): Minimum frequency as a fraction of Nyquist (e.g., 0.02)
+- `freq_max_frac_nyq` (float): Maximum frequency as a fraction of Nyquist (e.g., 0.80)
+- `window_spectrogram_s` (float): Spectrogram window length [s] (local diagnostics)
+- `overlap_spectrogram_frac` (float): Spectrogram overlap fraction (0.5 = 50%) (local diagnostics)
+- `save_results` (bool): If True, saves figures + CSV
+- `results_dir` (str): Output directory
+
+**Outputs:**
+
+- Returns a dictionary with frequency arrays and dB curves
+- Optional figure: `frequency_response_local_time_spectrogram_fft.png`,  `frequency_response.png`and `frequency_response_normalized.png`
+- Optional CSV: `frequency_response_normalized.csv`
 
 
   
@@ -432,18 +452,14 @@ Prints a compact text summary of `calculate_crosstalk()` results.
 See `self_noise_test.ipynb` for a complete example using synthetic data:
 
 - Generates known ASD synthetic signals
-
 - Validates calculation accuracy
-
 - Demonstrates all visualization options
 
 
 See `dynamic_range_test.ipynb` for a complete example using synthetic data:
 
 - Extract and process data from a npy DAS matrix
-
 - Calculates dynamic range limit using Hilbert (`delta_t_from_window_start` [s], `peak_last_cycle` [µε], `peak_over_basis` [dB re rad/√Hz])
-
 - Calculates dynamic range limit using THD (`delta_t_from_window_start` [s], `peak_last_cycle` [µε], `peak_over_basis` [dB re rad/√Hz])
 
 
@@ -460,6 +476,13 @@ See `crosstalk_test.ipynb` for a complete example using synthetic data:
 - Computes crosstalk using `calculate_crosstalk()`
 - Plots the profile using `plot_crosstalk()` and prints a report via `report_crosstalk()`
 
+
+See `frequency_response_test.ipynb` for a complete example using synthetic data:
+
+- Extract and process data from a npy DAS matrix
+- Calculates DAS Frequency Response in [Strain (dB re 1 µε)])
+- Calculates Normalized Frequency Response in [dB])
+
   
 
 ## 📊 Typical Workflow
@@ -468,27 +491,18 @@ See `crosstalk_test.ipynb` for a complete example using synthetic data:
 ### Self-Noise Workflow
 
 1. **Prepare Data**: Load DAS measurements (channels × samples)
-
 2. **Define Sections**: Select channel ranges for analysis
-
 3. **Calculate Self-Noise**: Use `calculate_self_noise()` with appropriate parameters
-
 4. **Visualize**: Create plots with `plot_combined_self_noise_db()`
-
 5. **Report**: Generate text summaries with `report_self_noise()`
 
 ### Dynamic Range Workflow
 
 1. **Prepare Data**: Load DAS measurements (time × channels) from `.npy`
-
 2. **Extract Trace**: Use `load_dynamic_range_data()` to pick `x1_m/x2_m`, select `POS`, and average channels
-
 3. **Pre-process**: Use `data_processing()` for phase to strain (if needed) and high-pass (optional)
-
 4. **Hilbert Test**: Run `calculate_dynamic_range_hilbert()` to detect envelope-error trigger
-
 5. **THD Test**: Run `calculate_dynamic_range_thd()` to detect harmonic-distortion trigger
-
 6. **Report / Save**: Store plots + CSV summaries for traceability
 
 
@@ -507,6 +521,15 @@ See `crosstalk_test.ipynb` for a complete example using synthetic data:
 2. **Compute Crosstalk**: Run `calculate_crosstalk()` with `stimulus_freq`, `fs`, `gauge_length`, and `channel_spacing`
 3. **Visualize**: Plot profiles with `plot_crosstalk()`
 4. **Report**: Print summaries using `report_crosstalk()`
+
+
+### Frequency Response Workflow
+
+1. **Prepare Data**: Load DAS measurements (time × channels) from `.npy`
+2. **Extract Trace**: Use `load_frequency_response_data()` to pick `STRETCHER_START_M/STRETCHER_END_M` center position and average channels
+3. **Pre-process**: Use `data_processing()` for phase to strain (if needed) and high-pass (optional)
+4. **Frequency Response Test**: Run `analyze_frequency_response()` to calculate frequency response
+5. **Report / Save**: Store plots + CSV summaries for traceability
 
 
   
@@ -555,7 +578,9 @@ pySEAFOM/
 
 ├── source/
 
-│   └── simulation_dynamic_range.py      # generate sythetic data for dynamic_range
+│   └── simulation_dynamic_range.py      # generate data for dynamic_range
+
+│   └── simulation_frequency_response.py   # generate data for frequency_response
 
 │   └── pySEAFOM/
 
@@ -567,6 +592,10 @@ pySEAFOM/
 
 │       └── fidelity.py             # fidelity / THD analysis engine
 
+│       └── crosstalk.py             # crosstalk analysis engine
+
+│       └── frequency_response.py      # frequency_response analysis engine
+
 ├── testing_notebooks/
 
 │   └── self_noise_test.ipynb      # synthetic validation notebook
@@ -575,6 +604,10 @@ pySEAFOM/
 
 │   └── fidelity_test.ipynb         # synthetic validation notebook
 
+│   └── crosstalk_test.ipynb         # crosstalk validation notebook
+
+│   └── frequency_response_test.ipynb  # frequency_response validation notebook
+
 ├── workflows/
 
 │   └── SELF_NOISE_WORKFLOW.md     # step-by-step processing summary
@@ -582,6 +615,10 @@ pySEAFOM/
 │   └── DYNAMIC_RANGE_WORKFLOW.md     # step-by-step processing summary
 
 │   └── FIDELITY_WORKFLOW.md        # step-by-step processing summary
+
+│   └── CROSSTALK_WORKFLOW.md     # step-by-step processing summary
+
+│   └── FREQUENCY_RESPONSE_WORKFLOW.md        # step-by-step processing summary
 
 ├── README.md
 
