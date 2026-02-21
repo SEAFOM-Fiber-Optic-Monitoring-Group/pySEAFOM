@@ -419,7 +419,7 @@ Optional unit conversion (phase to strain) and optional high-pass filtering for 
 
 - 1D array: processed signal (microstrain [µε] if conversion is enabled)
 
-#### `analyze_frequency_response()
+#### `calculate_frequency_response()
 `
 Frequency response test. Computes the DAS frequency response (FFT magnitude in dB re 1 µε) and the normalized frequency response over the step frequencies.
 
@@ -528,7 +528,7 @@ See `frequency_response_test.ipynb` for a complete example using synthetic data:
 1. **Prepare Data**: Load DAS measurements (time × channels) from `.npy`
 2. **Extract Trace**: Use `load_frequency_response_data()` to pick `STRETCHER_START_M/STRETCHER_END_M` center position and average channels
 3. **Pre-process**: Use `data_processing()` for phase to strain (if needed) and high-pass (optional)
-4. **Frequency Response Test**: Run `analyze_frequency_response()` to calculate frequency response
+4. **Frequency Response Test**: Run `calculate_frequency_response()` to calculate frequency response
 5. **Report / Save**: Store plots + CSV summaries for traceability
 
 

@@ -402,7 +402,7 @@ def plot_time_spectrogram_fft(
     return out_path
 
 
-def analyze_frequency_response(
+def calculate_frequency_response(
     *,
     time_s: NDArray[np.floating],
     signal_microstrain: NDArray[np.floating],

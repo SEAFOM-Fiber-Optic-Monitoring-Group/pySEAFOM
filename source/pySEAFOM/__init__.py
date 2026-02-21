@@ -32,8 +32,8 @@ from .self_noise import (
 from .dynamic_range import (
     load_dynamic_range_data,
     data_processing,
-    analyze_dynamic_range_hilbert,
-    analyze_dynamic_range_thd,
+    calculate_dynamic_range_hilbert,
+    calculate_dynamic_range_thd,
 )
 
 from .fidelity import (
@@ -55,7 +55,7 @@ from .frequency_response import (
     phase_to_strain,
     extract_local_signal,
     compute_frequency_response,
-    analyze_frequency_response,
+    calculate_frequency_response,
 )
 
 __all__ = [
@@ -74,8 +74,8 @@ __all__ = [
     # dynamic_range
     "load_dynamic_range_data",
     "data_processing",
-    "analyze_dynamic_range_hilbert",
-    "analyze_dynamic_range_thd",
+    "calculate_dynamic_range_hilbert",
+    "calculate_dynamic_range_thd",
 
     # fidelity
     "calculate_fidelity_thd",
@@ -94,5 +94,5 @@ __all__ = [
     "phase_to_strain",
     "extract_local_signal",
     "compute_frequency_response",
-    "analyze_frequency_response",
+    "calculate_frequency_response",
 ]

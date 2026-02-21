@@ -36,6 +36,7 @@
         <a href="tests/dynamic-range.html">Dynamic range</a>
         <a href="tests/fidelity.html">Fidelity (THD)</a>
         <a href="tests/crosstalk.html">Crosstalk</a>
+        <a href="tests/frequency-response.html">Frequency response</a>
         <div class="sidebar-section">Links</div>
         <a href="#resources">Resources</a>
       </nav>
@@ -56,6 +57,7 @@
           <li><strong>Dynamic range</strong> – <span class="muted">pySEAFOM.dynamic_range</span></li>
           <li><strong>Fidelity (THD)</strong> – <span class="muted">pySEAFOM.fidelity</span></li>
           <li><strong>Crosstalk</strong> – <span class="muted">pySEAFOM.crosstalk</span></li>
+          <li><strong>Frequency response</strong> – <span class="muted">pySEAFOM.frequency_response</span></li>
         </ul>
       </section>
 
@@ -154,6 +156,27 @@
             href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/CROSSTALK_WORKFLOW.md">Workflow</a>
           <a class="button"
             href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/crosstalk_test.ipynb">Notebook</a>
+        </div>
+      </section>
+
+      <section id="frequency-response" class="card">
+        <h2>Frequency response</h2>
+        <p class="muted">Estimates DAS frequency response and normalized response from a local trace near the stretcher
+          region.</p>
+        <div class="kv">
+          <div><span class="k">Primary API</span> <span class="v">pySEAFOM.frequency_response.calculate_frequency_response</span></div>
+          <div><span class="k">Output</span> <span class="v">response curve (dB re 1 µε) + normalized response points</span></div>
+        </div>
+        <ul class="bullets">
+          <li>Loads 2D DAS data, extracts a local 1D trace, and optionally converts phase→strain + high-pass filters.</li>
+          <li>Produces local diagnostics (time/spectrogram/FFT) and optional plots + CSV outputs.</li>
+        </ul>
+        <div class="links-row">
+          <a class="button primary" href="tests/frequency-response.html">Open test page</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/FREQUENCY_RESPONSE_WORKFLOW.md">Workflow</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/frequency_response_test.ipynb">Notebook</a>
         </div>
       </section>
 
