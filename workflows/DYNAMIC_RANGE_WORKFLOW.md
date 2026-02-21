@@ -6,7 +6,7 @@
 ## Overview
 
 - Purpose: estimate the **dynamic range limit** from a controlled input where amplitude and slew rate increases over time.
-- Implementation: `pySEAFOM.source.pySEAFOM.dynamic_range` module (version 0.1.8).
+- Implementation: `pySEAFOM.source.pySEAFOM.dynamic_range` module (version 0.1.9).
 - Key outputs: trigger time (absolute + relative), limit amplitude µε at trigger, and optional plots + CSV logs.
 - Optional output: peak-over-basis in dB re rad/√Hz (requires radian_basis + gauge_length).
 
