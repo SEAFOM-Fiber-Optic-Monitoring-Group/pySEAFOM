@@ -5,14 +5,11 @@
 # pySEAFOM
 
   
-
 A Python library for performance analysis and testing of Distributed Acoustic Sensing (DAS) interrogators, developed by SEAFOM's Measuring Sensor Performance group. This package provides standardized tools for testing, benchmarking, and performance evaluation of DAS systems following SEAFOM recommended procedures.
 
   
-
 ## 🌐 Purpose
 
-  
 
 To promote transparency, consistency, and collaboration in the evaluation of DAS interrogator performance by providing open-source tools and standardized workflows.
 
@@ -43,7 +40,6 @@ pip install pySEAFOM
 ```python
 
 from pySEAFOM import calculate_self_noise, plot_combined_self_noise_db
-
 import numpy as np
 
 ```
@@ -55,75 +51,45 @@ import numpy as np
 ```python
 
 import pySEAFOM
-
 import numpy as np
 
-  
 
 # Load your DAS data (channels × time samples)
-
 data = np.load('your_das_data.npy')  # Shape: (n_channels, n_samples)
-
-  
+ 
 
 # Define test sections (channel ranges to analyze)
-
 sections = [data[0:50, :], data[100:150, :]]  # Two cable sections
-
 section_names = ['Section A', 'Section B']
-
   
-
 # Calculate self-noise for each section (using direct import)
-
 results = calculate_self_noise(
-
     sections,
-
     interrogation_rate=10000,  # Hz
-
     gauge_length=10.0,         # meters
-
     window_function='blackman-harris',
-
     data_type='pε'             # picostrain
-
 )
-
-  
+ 
 
 # OR using module import:
-
 # results = pySEAFOM.self_noise.calculate_self_noise(
-
     sections,
-
     interrogation_rate=10000,  # Hz
-
     gauge_length=10.0,         # meters
-
     window_function='blackman-harris',
-
-    data_type='pε'             # picostrain
+    data_type='pε'             # picostrain
 
 )
-
-  
+ 
 
 # Visualize results
-
 plot_combined_self_noise_db(
-
     results=results,
-
     test_sections=section_names,
-
     gauge_length=10.0,
-
-    org_data_unit='pε',
-
+    org_data_unit='pε',
     title='DAS Self-Noise Test Results'
-
 )
 
 
