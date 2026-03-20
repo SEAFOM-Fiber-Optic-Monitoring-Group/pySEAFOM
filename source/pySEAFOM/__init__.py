@@ -9,10 +9,11 @@ Modules:
 - dynamic_range: Dynamic range analysis (Hilbert envelope and sliding THD)
 - fidelity: Fidelity / THD analysis tools
 - crosstalk: Crosstalk analysis tools
-- frequency_response: MSP-02 frequency response analysis tools
+- frequency_response: Frequency response analysis tools
+- spatial resolution: Spatial resolution analysis tools 
 """
 
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 __author__ = "SEAFOM Fiber Optic Monitoring Group"
 
 # Import submodules
@@ -21,6 +22,8 @@ from . import dynamic_range
 from . import fidelity
 from . import crosstalk
 from . import frequency_response
+from . import spatial_resolution
+
 
 # Convenience imports for commonly used functions
 from .self_noise import (
@@ -58,6 +61,11 @@ from .frequency_response import (
     calculate_frequency_response,
 )
 
+from .spatial_resolution import (
+    load_spatial_resolution_data,
+    calculate_spatial_resolution,
+)
+
 __all__ = [
     # submodules
     "self_noise",
@@ -65,6 +73,7 @@ __all__ = [
     "fidelity",
     "crosstalk",
     "frequency_response",
+    "spatial_resolution",
 
     # self_noise
     "calculate_self_noise",
@@ -95,4 +104,8 @@ __all__ = [
     "extract_local_signal",
     "compute_frequency_response",
     "calculate_frequency_response",
+
+    # spatial_resolution
+    "load_spatial_resolution_data",
+    "calculate_spatial_resolution"
 ]
