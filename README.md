@@ -139,9 +139,11 @@ Crosstalk analysis
 
 Frequency response analysis
 
-### Future Modules (Planned)
+#### `pySEAFOM.spatial_resolution`
 
-- **Spatial Resolution**: Gauge length verification
+Spatial resolution analysis
+
+### Future Modules (Planned)
 
 - **Noise Floor**: System noise characterization
 
@@ -409,6 +411,81 @@ Frequency response test. Computes the DAS frequency response (FFT magnitude in d
 - Optional CSV: `frequency_response_normalized.csv`
 
 
+
+
+### Main Functions (spatial_resolution)
+
+#### `load_spatial_resolution_data()`
+
+Loads one (or many) `.npy` files, builds a 2D matrix (concatenated along time), and extracts a spatial-temporal section for analysis.
+
+**Parameters:**
+
+- `folder_or_file` (str): Folder with `.npy` files or a single `.npy` file
+- `fs` (float): Sampling / interrogator rate in Hz
+- `delta_x_m` (float): Spatial step between channels [m]
+- `x1_m` (float): Spatial window start [m]
+- `x2_m` (float): Spatial window end [m]
+- `time_start_s` (float): Analysis window start time [s]
+- `duration` (float | None): Analysis window duration [s]
+- `matrix_layout` (str): `'time_space'`, `'space_time'`, or `'auto'`
+
+**Returns:**
+
+- `(time_s, section_data)` where:
+  - `time_s` is a 1D time vector [s]
+  - `section_data` is a 2D matrix `(n_time, n_space)` representing the extracted section
+
+
+#### `data_processing()`
+
+Optional unit conversion (phase to strain) and optional high-pass filtering for the extracted data.
+
+**Parameters:**
+
+- `data` (2D array): Input data (phase [rad] or strain)
+- `data_is_strain` (bool): If False, converts phase [rad] to microstrain [µε]
+- `gauge_length` (float): Gauge length [m] (used for conversion)
+- `highpass_hz` (float | None): High-pass cutoff [Hz] (set None to disable)
+- `fs` (float): Sampling rate [Hz] (required when high-pass is enabled)
+
+**Returns:**
+
+- 2D array: processed data (microstrain [µε] if conversion is enabled)
+
+
+#### `calculate_spatial_resolution()`
+
+Estimates the spatial resolution from the spatial amplitude profile at a reference frequency.
+
+**Parameters:**
+
+- `section_data` (2D array): Input matrix `(n_ssl, n_samples)` (space × time)
+- `fs` (float): Sampling rate [Hz]
+- `delta_x_m` (float): Spatial step [m]
+- `ref_freq_hz` (float): Reference stimulus frequency [Hz]
+- `fft_size` (int): FFT block size
+- `snr_threshold_db` (float): Recommended minimum SNR
+- `target_pos_m` (float): Expected stretcher position [m]
+- `save_results` (bool): Save figures + CSV summary
+- `results_dir` (str): Output directory
+
+**Outputs:**
+
+- Returns a summary that includes:
+  - detected peak position
+  - SNR
+  - `LL` (left slope width)
+  - `LR` (right slope width)
+  - spatial resolution (mean of `LL` and `LR`)
+- Optional figures:
+  - `spatiotemporal_map.png`
+  - `spatial_resolution_profile.png`
+- Optional CSV:
+  - `spatial_resolution_summary.csv`
+
+
+
   
 
 ## 🧪 Example Notebook
@@ -449,6 +526,13 @@ See `frequency_response_test.ipynb` for a complete example using synthetic data:
 - Calculates DAS Frequency Response in [Strain (dB re 1 µε)])
 - Calculates Normalized Frequency Response in [dB])
 
+
+
+See `spatial_resolution_test.ipynb` for a complete example using synthetic data:
+
+- Extract and process a spatial-temporal section from a `.npy` DAS matrix
+- Calculate the spatial amplitude profile at the reference frequency
+- Estimate spatial resolution from the left and right slope widths (`LL` [m], `LR` [m], `spatial_resolution_m` [m], `peak_position_m` [m], `snr_db` [dB])
   
 
 ## 📊 Typical Workflow
@@ -499,6 +583,15 @@ See `frequency_response_test.ipynb` for a complete example using synthetic data:
 
 
   
+### Spatial Resolution Workflow
+
+1. **Prepare Data**: Load DAS measurements (time × channels) from `.npy`
+2. **Extract Section**: Use `load_spatial_resolution_data()` to select the spatial window (`x1_m/x2_m`) and time window
+3. **Pre-process**: Use `data_processing()` for phase to strain (if needed) and high-pass (optional)
+4. **Build Spatial Profile**: Extract the amplitude at `ref_freq_hz` for each spatial channel (SSL)
+5. **Estimate Resolution**: Run `calculate_spatial_resolution()` to compute `LL`, `LR`, and spatial resolution
+6. **Report / Save**: Store plots + CSV summaries for traceability
+
 
 ## 🔧 Development Setup
 
@@ -548,6 +641,8 @@ pySEAFOM/
 
 │   └── simulation_frequency_response.py   # generate data for frequency_response
 
+│   └── simulation_spatial_resolution.py   # generate data for spatial_resolution
+
 │   └── pySEAFOM/
 
 │       ├── __init__.py            # package exports
@@ -562,6 +657,8 @@ pySEAFOM/
 
 │       └── frequency_response.py      # frequency_response analysis engine
 
+│       └── spatial_resolution.py      # spatial_resolution analysis engine
+
 ├── testing_notebooks/
 
 │   └── self_noise_test.ipynb      # synthetic validation notebook
@@ -574,6 +671,8 @@ pySEAFOM/
 
 │   └── frequency_response_test.ipynb  # frequency_response validation notebook
 
+│   └── spatial_resolution_test.ipynb  # spatial_resolution validation notebook
+
 ├── workflows/
 
 │   └── SELF_NOISE_WORKFLOW.md     # step-by-step processing summary
@@ -585,6 +684,8 @@ pySEAFOM/
 │   └── CROSSTALK_WORKFLOW.md     # step-by-step processing summary
 
 │   └── FREQUENCY_RESPONSE_WORKFLOW.md        # step-by-step processing summary
+
+│   └── SPATIAL_RESOLUTION_WORKFLOW.md        # step-by-step processing summary
 
 ├── README.md
 
