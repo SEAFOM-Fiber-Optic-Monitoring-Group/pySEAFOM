@@ -13,6 +13,11 @@ A Python library for performance analysis and testing of Distributed Acoustic Se
 
 To promote transparency, consistency, and collaboration in the evaluation of DAS interrogator performance by providing open-source tools and standardized workflows.
 
+
+## 📚 Documentation
+
+Live site (GitHub Pages): https://seafom-fiber-optic-monitoring-group.github.io/pySEAFOM/
+
   
 
 ## ⚡ Quick Start
@@ -148,12 +153,9 @@ Spatial resolution analysis
 - **Noise Floor**: System noise characterization
 
 
-## 📚 Documentation
+## Functions
 
-Live site (GitHub Pages): https://seafom-fiber-optic-monitoring-group.github.io/pySEAFOM/
-
-
-### Main Functions (self_noise)
+### self_noise
 
 #### `calculate_self_noise()`
 
@@ -203,7 +205,7 @@ Prints formatted text report.
 
 
 
-### Main Functions (dynamic_range)
+### dynamic_range
 #### `load_dynamic_range_data()`
 
 Loads one (or many) `.npy` files, builds a 2D matrix, and extracts a 1D trace at a chosen spatial position.
@@ -296,7 +298,7 @@ Sliding THD dynamic range test. Computes THD in a moving window and triggers whe
 - Optional CSV: `dynamic_range_thd.csv`
 
 
-### Main Functions (fidelity)
+### fidelity
 
 #### `calculate_fidelity_thd()`
 
@@ -320,7 +322,7 @@ Computes fidelity as THD (%) at a known stimulus frequency for a single pre-slic
 Prints a compact text summary of `calculate_fidelity_thd()` results.
 
 
-### Main Functions (crosstalk)
+### crosstalk
 
 #### `calculate_crosstalk()`
 
@@ -345,7 +347,7 @@ Prints a compact text summary of `calculate_crosstalk()` results.
   
 
 
-### Main Functions (frequency_response)
+### frequency_response
 
 #### `load_frequency_response_data()`
 
@@ -413,7 +415,7 @@ Frequency response test. Computes the DAS frequency response (FFT magnitude in d
 
 
 
-### Main Functions (spatial_resolution)
+### spatial_resolution
 
 #### `load_spatial_resolution_data()`
 
