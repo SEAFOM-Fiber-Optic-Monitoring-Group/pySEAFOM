@@ -16,7 +16,7 @@ To promote transparency, consistency, and collaboration in the evaluation of DAS
 
 ## 📚 Documentation
 
-Live site (GitHub Pages): https://seafom-fiber-optic-monitoring-group.github.io/pySEAFOM/
+https://seafom-fiber-optic-monitoring-group.github.io/pySEAFOM/
 
   
 
