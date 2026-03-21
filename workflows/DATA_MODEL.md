@@ -26,7 +26,7 @@ The current codebase exposes three main data-model families:
 
 | Input Name | Type | Shape | Used By | Description |
 |-----------|------|-------|---------|-------------|
-| `data_sections` | `list[numpy.ndarray]` | each array `(n_channels, n_samples)` | `self_noise.calculate_self_noise()` | Multiple pre-sliced cable sections analyzed independently |
+| `data_sections` | `list[numpy.ndarray]` | each array `(n_channels, n_samples)` | `self_noise.calculate_self_noise()` | Multiple pre-sliced sections analyzed independently |
 | `section_data` | `numpy.ndarray` | `(n_ssl, n_samples)` | `crosstalk.calculate_crosstalk()`, `spatial_resolution.calculate_spatial_resolution()` | One spatial section where each row is one SSL/channel |
 | `time_series_data` | `numpy.ndarray` | `(n_channels, n_samples)` | `fidelity.calculate_fidelity_thd()` | One section used for per-channel THD across one or more time windows |
 | `time_s` + `signal_microstrain` | `numpy.ndarray` + `numpy.ndarray` | both `(n_samples,)` | `dynamic_range.*`, `frequency_response.calculate_frequency_response()` | One extracted local trace aligned to a time vector |
@@ -40,7 +40,7 @@ The current codebase exposes three main data-model families:
 - `n_channels`: Number of spatial channels in the section
 - `n_samples`: Number of time samples per channel
 
-**Description**: List of 2D arrays, where each array represents a cable section to be analyzed independently by the analysis engines.
+**Description**: List of 2D arrays, where each array represents a section to be analyzed independently by the analysis engines.
 
 **Example**:
 ```python
