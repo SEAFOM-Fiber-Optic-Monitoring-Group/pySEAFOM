@@ -488,41 +488,6 @@ Estimates the spatial resolution from the spatial amplitude profile at a referen
 
 
 
-## 🔧 Development Setup
-
-  
-
-```bash
-
-# Clone the repository
-
-git clone https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM.git
-
-cd pySEAFOM
-
-  
-
-# Install in development mode
-
-pip install -e .
-
-  
-
-# Install development dependencies
-
-pip install -e ".[dev]"
-
-  
-
-# Run tests (if available)
-
-pytest tests/
-
-```
-
-
-  
-
 ## 🤝 Contributing
 
   
