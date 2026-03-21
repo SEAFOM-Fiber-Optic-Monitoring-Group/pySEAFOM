@@ -39,24 +39,11 @@ pip install pySEAFOM
 ### Basic Usage
 
   
-
-**Option 1: Import specific functions directly**
-
 ```python
 
 from pySEAFOM import calculate_self_noise, plot_combined_self_noise_db
 import numpy as np
 
-```
-
-  
-
-**Option 2: Import modules (recommended when using multiple engines)**
-
-```python
-
-import pySEAFOM
-import numpy as np
 
 
 # Load your DAS data (channels × time samples)
@@ -97,22 +84,6 @@ plot_combined_self_noise_db(
     title='DAS Self-Noise Test Results'
 )
 
-
-# Fidelity (THD) example (single-section call; loop sections externally)
-section_ranges = [[0, 49], [100, 149]]
-section_names = ['Section A', 'Section B']
-
-for name, (ch0, ch1) in zip(section_names, section_ranges):
-  section = data[ch0:ch1 + 1, :]
-  fidelity_results = pySEAFOM.fidelity.calculate_fidelity_thd(
-    section,
-    fs=10000,
-    levels_time_steps=[[0, 600000], [660000, 1500000]],
-    stimulus_freq=500,
-    snr_threshold_db=-40,
-    section_name=name,
-  )
-  pySEAFOM.fidelity.report_fidelity_thd(fidelity_results)
 
 ```
 
