@@ -5,7 +5,7 @@
 ## Overview
 
 - Purpose: estimate the **DAS frequency response** and the **normalized frequency response** from a controlled stepwise-frequency excitation measured on a stretcher region.
-- Implementation: `pySEAFOM.frequency_response` module (version 0.1.9).
+- Implementation: `pySEAFOM.frequency_response` module (version 0.1.10).
 - Key outputs: DAS response curve in dB re 1 µε, normalized response frequency points, and optional plots + CSV logs.
 
 ## Required Inputs: (load_frequency_response_data) and (data_processing) are used to extract data for Frequency Response

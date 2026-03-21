@@ -477,7 +477,7 @@ def calculate_spatial_resolution(
     }
 
     if print_report:
-        print_sr_report(result)
+        report_spatial_resolution(result)
 
     if save_results:
         _ensure_dir(results_dir)
@@ -517,7 +517,7 @@ def calculate_spatial_resolution(
         else:
             title += f"\nSR = {result['spatial_resolution_m']:.3f} m"
 
-        fig2, _ = plot_sr_profile(
+        fig2, _ = plot_spatial_resolution_profile(
             result,
             title=title,
             ref_freq_hz=ref_freq_hz,
@@ -644,7 +644,7 @@ def plot_spatiotemporal(
     return fig, axes
 
 
-def plot_sr_profile(
+def plot_spatial_resolution_profile(
     result: Dict[str, Any],
     *,
     title: str = "Spatial Resolution Profile",
@@ -682,17 +682,17 @@ def plot_sr_profile(
         a, b = coeffs
         return sorted([(0.0 - b) / a, (1.0 - b) / a])
 
-    if coeffs_L is not None:
+    if coeffs_L is not None and np.isfinite(LL_m):
         xl0, xl1 = _slope_xy(coeffs_L)
         yl = [0, 1] if coeffs_L[0] > 0 else [1, 0]
         ax.plot([xl0, xl1], yl, "r-", lw=2.5, label="Piecewise fit")
 
-    if coeffs_R is not None:
+    if coeffs_R is not None and np.isfinite(LR_m):
         xr0, xr1 = _slope_xy(coeffs_R)
         yr = [1, 0] if coeffs_R[0] < 0 else [0, 1]
         ax.plot([xr0, xr1], yr, "r-", lw=2.5)
 
-    if coeffs_L is not None and coeffs_R is not None:
+    if coeffs_L is not None and coeffs_R is not None and np.isfinite(LL_m) and np.isfinite(LR_m):
         x_top_l = (1.0 - coeffs_L[1]) / coeffs_L[0]
         x_top_r = (1.0 - coeffs_R[1]) / coeffs_R[0]
         ax.plot([x_top_l, x_top_r], [1.0, 1.0], "r-", lw=2.5)
@@ -778,7 +778,7 @@ def plot_sr_profile(
 # Report
 # =============================================================================
 
-def print_sr_report(result: Dict[str, Any]) -> None:
+def report_spatial_resolution(result: Dict[str, Any]) -> None:
     p = result["params"]
     SR = result["spatial_resolution_m"]
     GL = p["gauge_length"]
@@ -801,3 +801,13 @@ def print_sr_report(result: Dict[str, Any]) -> None:
     if GL is not None:
         print(f"Deviation from GL      : {dev:+.3f} m")
     print("-" * 70)
+
+
+def plot_sr_profile(*args, **kwargs):
+    """Backward-compatible alias for plot_spatial_resolution_profile()."""
+    return plot_spatial_resolution_profile(*args, **kwargs)
+
+
+def print_sr_report(*args, **kwargs):
+    """Backward-compatible alias for report_spatial_resolution()."""
+    return report_spatial_resolution(*args, **kwargs)

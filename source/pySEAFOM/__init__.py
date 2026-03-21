@@ -64,6 +64,8 @@ from .frequency_response import (
 from .spatial_resolution import (
     load_spatial_resolution_data,
     calculate_spatial_resolution,
+    report_spatial_resolution,
+    plot_spatial_resolution_profile,
 )
 
 __all__ = [
@@ -107,5 +109,7 @@ __all__ = [
 
     # spatial_resolution
     "load_spatial_resolution_data",
-    "calculate_spatial_resolution"
+    "calculate_spatial_resolution",
+    "report_spatial_resolution",
+    "plot_spatial_resolution_profile",
 ]

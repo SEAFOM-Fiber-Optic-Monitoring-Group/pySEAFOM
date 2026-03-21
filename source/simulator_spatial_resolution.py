@@ -1,5 +1,5 @@
 """
-syntheticData_spatial_resolution.py
+simulator_spatial_resolution.py
 ===================================
 Synthetic data generator for the SEAFOM MSP-02 Spatial Resolution test.
 
@@ -216,7 +216,7 @@ def _plot_colormap(
     plt.show()
 
 
-def generate_spatial_resolution_data(
+def simulate_spatial_resolution_data(
     *,
     total_duration_s: float = TOTAL_DURATION_S,
     fs_hz: float = FS,
@@ -309,6 +309,11 @@ def generate_spatial_resolution_data(
     return data, ssl_positions_m, time_s, amp_profile, meta
 
 
+def generate_spatial_resolution_data(*args, **kwargs):
+    """Backward-compatible alias for simulate_spatial_resolution_data()."""
+    return simulate_spatial_resolution_data(*args, **kwargs)
+
+
 # ======================================================================
 # MAIN
 # ======================================================================
@@ -318,7 +323,7 @@ if __name__ == "__main__":
     print(" Synthetic Data Generation - Spatial Resolution (MSP-02 §7.5)")
     print("=" * 70)
 
-    data, ssl_positions_m, time_s, amp_profile, meta = generate_spatial_resolution_data()
+    data, ssl_positions_m, time_s, amp_profile, meta = simulate_spatial_resolution_data()
 
     symmetric_tag = "symmetric" if np.isclose(RAMP_LEFT_M, RAMP_RIGHT_M) else "asymmetric"
 

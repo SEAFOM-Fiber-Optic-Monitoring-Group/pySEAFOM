@@ -37,6 +37,7 @@
         <a href="tests/fidelity.html">Fidelity (THD)</a>
         <a href="tests/crosstalk.html">Crosstalk</a>
         <a href="tests/frequency-response.html">Frequency response</a>
+        <a href="tests/spatial-resolution.html">Spatial resolution</a>
         <div class="sidebar-section">Links</div>
         <a href="#resources">Resources</a>
       </nav>
@@ -58,6 +59,7 @@
           <li><strong>Fidelity (THD)</strong> – <span class="muted">pySEAFOM.fidelity</span></li>
           <li><strong>Crosstalk</strong> – <span class="muted">pySEAFOM.crosstalk</span></li>
           <li><strong>Frequency response</strong> – <span class="muted">pySEAFOM.frequency_response</span></li>
+          <li><strong>Spatial resolution</strong> – <span class="muted">pySEAFOM.spatial_resolution</span></li>
         </ul>
       </section>
 
@@ -164,11 +166,14 @@
         <p class="muted">Estimates DAS frequency response and normalized response from a local trace near the stretcher
           region.</p>
         <div class="kv">
-          <div><span class="k">Primary API</span> <span class="v">pySEAFOM.frequency_response.calculate_frequency_response</span></div>
-          <div><span class="k">Output</span> <span class="v">response curve (dB re 1 µε) + normalized response points</span></div>
+          <div><span class="k">Primary API</span> <span
+              class="v">pySEAFOM.frequency_response.calculate_frequency_response</span></div>
+          <div><span class="k">Output</span> <span class="v">response curve (dB re 1 µε) + normalized response
+              points</span></div>
         </div>
         <ul class="bullets">
-          <li>Loads 2D DAS data, extracts a local 1D trace, and optionally converts phase→strain + high-pass filters.</li>
+          <li>Loads 2D DAS data, extracts a local 1D trace, and optionally converts phase→strain + high-pass filters.
+          </li>
           <li>Produces local diagnostics (time/spectrogram/FFT) and optional plots + CSV outputs.</li>
         </ul>
         <div class="links-row">
@@ -177,6 +182,29 @@
             href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/FREQUENCY_RESPONSE_WORKFLOW.md">Workflow</a>
           <a class="button"
             href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/frequency_response_test.ipynb">Notebook</a>
+        </div>
+      </section>
+
+      <section id="spatial-resolution" class="card">
+        <h2>Spatial resolution</h2>
+        <p class="muted">Estimates spatial resolution by extracting the response profile at the reference tone and
+          fitting left/right transition slopes.</p>
+        <div class="kv">
+          <div><span class="k">Primary API</span> <span
+              class="v">pySEAFOM.spatial_resolution.calculate_spatial_resolution</span></div>
+          <div><span class="k">Output</span> <span class="v">LL/LR widths + spatial resolution + peak position +
+              SNR</span></div>
+        </div>
+        <ul class="bullets">
+          <li>Loads/crops 2D DAS data to a target section and supports phase-to-strain preprocessing.</li>
+          <li>Provides optional spatiotemporal and profile plots plus summary CSV output.</li>
+        </ul>
+        <div class="links-row">
+          <a class="button primary" href="tests/spatial-resolution.html">Open test page</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/workflows/SPATIAL_RESOLUTION_WORKFLOW.md">Workflow</a>
+          <a class="button"
+            href="https://github.com/SEAFOM-Fiber-Optic-Monitoring-Group/pySEAFOM/blob/main/testing_notebooks/spatial_resolution_test.ipynb">Notebook</a>
         </div>
       </section>
 
